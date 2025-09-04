@@ -24,7 +24,7 @@
 
 <body>
     <header>
-        <div class="navbar bg-base-100 shadow-sm">
+        <div class="navbar bg-base-100 shadow-sm pl-8 pr-4 bg-[#BADEFF26]">
             <div class="navbar-start">
                 <div class="dropdown">
                     <div tabindex="0" role="button" class="btn btn-ghost lg:hidden">
@@ -72,15 +72,35 @@
     <section class="flex flex-col-reverse md:flex-row gap-10 justify-between py-5 w-11/12 mx-auto items-center">
         <div class="content flex-1 text-center md:text-left">
             <h2 class="text-4xl font-bold mb-8"><span class="text-sky-500 ">English</span> is Easy!!</h2>
-            <p class="font-bangla text-xl ">
-                আজ থেকেই আপনার ভাষা শেখার যাত্রা শুরু করুন। আপনি যদি নতুন হন অথবা আপনার দক্ষতা বাড়াতে চান, আমাদের
-                Interactive Lessons আপনাকে নিয়ে যাবে অন্য একটি Level এ
+            <p class="font-bangla text-2xl font-medium text-[#18181B]">
+                আজ থেকেই আপনার ভাষা শেখার যাত্রা শুরু করুন। আপনি যদি নতুন হন অথবা <br> আপনার দক্ষতা বাড়াতে চান, আমাদের
+                Interactive Lessons আপনাকে নিয়ে <br> যাবে অন্য একটি Level এ
             </p>
+            <div>
+                <fieldset class="fieldset rounded-box w-xs ">
+                    <legend class="fieldset-legend"></legend>
+
+                    <label class="label"></label>
+                    <input type="name" class="input" placeholder="Enter Your Name" />
+
+                    <label class="label"></label>
+                    <input type="password" class="input" placeholder="..........." />
+
+                    <button class="btn btn-outline btn-primary w-[140px] font-medium mt-4">Get Started</button>
+                </fieldset>
+            </div>
         </div>
         <div class="image flex-1">
             <img src="./assets/hero-student.png" alt="">
         </div>
     </section>
+
+    <div class="Lesson-Container text-center mt-4">
+        <h2 class="text-3xl font-bold mb-8"><span class="text-sky-500 ">Let's</span> Learn Vocabularies</h2>
+        <div id="level-container" class="flex gap-5 flex-wrap justify-center">
+        </div>
+    </div>
+    <script src="./script/script.js"></script>
 </body>
 
 </html>
