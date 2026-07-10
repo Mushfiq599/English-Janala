@@ -1,9 +1,7 @@
 export interface Lesson {
-  level_no: string;
-  lesson_name: string;
-  level: string;
-  no_of_words: string;
-  image: string;
+  id: number;
+  level_no: number;
+  lessonName: string;
 }
 
 export interface Word {
