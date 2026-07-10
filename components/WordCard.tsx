@@ -1,21 +1,29 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Word } from "@/types/word";
 import { pronounceWord } from "@/lib/speech";
 import { saveWord, removeSavedWord } from "@/lib/savedWords";
+import { markWordSeen } from "@/lib/progress";
 import { useAuth } from "@/context/AuthContext";
 import WordDetailModal from "@/components/WordDetailModal";
 
 interface Props {
   word: Word;
+  levelId: string;
 }
 
-export default function WordCard({ word }: Props) {
+export default function WordCard({ word, levelId }: Props) {
   const { user } = useAuth();
   const [saved, setSaved] = useState(false);
   const [saving, setSaving] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
+
+  // Mark word as seen when card renders
+  useEffect(() => {
+    if (!user) return;
+    markWordSeen(user.uid, levelId, word.id).catch(() => {});
+  }, [user, levelId, word.id]);
 
   const handleSave = async () => {
     if (!user) return;
@@ -36,7 +44,6 @@ export default function WordCard({ word }: Props) {
   return (
     <>
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 flex flex-col gap-3 hover:shadow-md transition">
-        {/* Word + pronounce */}
         <div className="flex items-start justify-between">
           <div>
             <h3 className="text-lg font-bold text-gray-800">{word.word}</h3>
@@ -53,19 +60,16 @@ export default function WordCard({ word }: Props) {
           </button>
         </div>
 
-        {/* Meaning */}
         <p className="text-sm text-gray-600 leading-relaxed line-clamp-2">
           {word.meaning}
         </p>
 
-        {/* Parts of speech badge */}
         {word.partsOfSpeech && (
           <span className="self-start text-xs bg-sky-50 text-sky-600 px-2 py-0.5 rounded-full font-medium">
             {word.partsOfSpeech}
           </span>
         )}
 
-        {/* Actions */}
         <div className="flex items-center gap-2 mt-auto pt-2 border-t border-gray-50">
           <button
             onClick={() => setModalOpen(true)}

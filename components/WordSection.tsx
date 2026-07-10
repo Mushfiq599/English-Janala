@@ -36,12 +36,6 @@ export default function WordSection({ levelId }: Props) {
       <div className="flex flex-col items-center py-20 text-red-500 gap-3">
         <span className="text-4xl">⚠️</span>
         <p>{error}</p>
-        <button
-          onClick={() => setLoading(true)}
-          className="text-sm px-4 py-2 bg-red-50 hover:bg-red-100 rounded-lg transition"
-        >
-          Retry
-        </button>
       </div>
     );
   }
@@ -57,12 +51,10 @@ export default function WordSection({ levelId }: Props) {
 
   return (
     <div>
-      <p className="text-sm text-gray-500 mb-6">
-        {words.length} words in this lesson
-      </p>
+      <p className="text-sm text-gray-500 mb-6">{words.length} words in this lesson</p>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
         {words.map((word) => (
-          <WordCard key={word.id} word={word} />
+          <WordCard key={word.id} word={word} levelId={levelId} />
         ))}
       </div>
     </div>
