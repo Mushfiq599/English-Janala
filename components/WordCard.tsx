@@ -19,7 +19,6 @@ export default function WordCard({ word, levelId }: Props) {
   const [saving, setSaving] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
 
-  // Mark word as seen when card renders
   useEffect(() => {
     if (!user) return;
     markWordSeen(user.uid, levelId, word.id).catch(() => {});
@@ -43,12 +42,29 @@ export default function WordCard({ word, levelId }: Props) {
 
   return (
     <>
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 flex flex-col gap-3 hover:shadow-md transition">
+      <div
+        style={{
+          backgroundColor: "var(--bg-card)",
+          borderColor: "var(--border-color)",
+        }}
+        className="rounded-2xl shadow-sm border p-5 flex flex-col gap-3 hover:shadow-md transition"
+      >
+        {/* Word + pronounce */}
         <div className="flex items-start justify-between">
           <div>
-            <h3 className="text-lg font-bold text-gray-800">{word.word}</h3>
+            <h3
+              style={{ color: "var(--text-primary)" }}
+              className="text-lg font-bold"
+            >
+              {word.word}
+            </h3>
             {word.pronunciation && (
-              <p className="text-xs text-gray-400 mt-0.5">/{word.pronunciation}/</p>
+              <p
+                style={{ color: "var(--text-muted)" }}
+                className="text-xs mt-0.5"
+              >
+                /{word.pronunciation}/
+              </p>
             )}
           </div>
           <button
@@ -60,17 +76,26 @@ export default function WordCard({ word, levelId }: Props) {
           </button>
         </div>
 
-        <p className="text-sm text-gray-600 leading-relaxed line-clamp-2">
+        {/* Meaning */}
+        <p
+          style={{ color: "var(--text-secondary)" }}
+          className="text-sm leading-relaxed line-clamp-2"
+        >
           {word.meaning}
         </p>
 
+        {/* Parts of speech badge */}
         {word.partsOfSpeech && (
           <span className="self-start text-xs bg-sky-50 text-sky-600 px-2 py-0.5 rounded-full font-medium">
             {word.partsOfSpeech}
           </span>
         )}
 
-        <div className="flex items-center gap-2 mt-auto pt-2 border-t border-gray-50">
+        {/* Actions */}
+        <div
+          style={{ borderColor: "var(--border-color)" }}
+          className="flex items-center gap-2 mt-auto pt-2 border-t"
+        >
           <button
             onClick={() => setModalOpen(true)}
             className="flex-1 text-sm font-medium py-1.5 rounded-lg bg-sky-50 hover:bg-sky-100 text-sky-600 transition"
@@ -95,10 +120,7 @@ export default function WordCard({ word, levelId }: Props) {
       </div>
 
       {modalOpen && (
-        <WordDetailModal
-          word={word}
-          onClose={() => setModalOpen(false)}
-        />
+        <WordDetailModal word={word} onClose={() => setModalOpen(false)} />
       )}
     </>
   );

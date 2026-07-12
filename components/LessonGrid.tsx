@@ -61,7 +61,8 @@ export default function LessonGrid({ lessons }: Props) {
       ) : (
         <div className="flex flex-col items-center justify-center py-20 text-center text-gray-400">
           <span className="text-5xl mb-4">📖</span>
-          <p className="text-lg font-medium">Select a lesson to start learning</p>
+          <p style={{ color: "var(--text-muted)" }} className="text-lg font-medium">Select a lesson to start learning</p>
+
           <p className="text-sm mt-1">Choose any lesson above to see its vocabulary words</p>
         </div>
       )}

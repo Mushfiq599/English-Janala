@@ -10,7 +10,6 @@ interface Props {
 }
 
 export default function WordDetailModal({ word, onClose }: Props) {
-  // Close on Escape key
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
@@ -25,13 +24,15 @@ export default function WordDetailModal({ word, onClose }: Props) {
       onClick={onClose}
     >
       <div
-        className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 relative"
+        style={{ backgroundColor: "var(--bg-card)" }}
+        className="rounded-2xl shadow-xl w-full max-w-md p-6 relative"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Close */}
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 text-xl"
+          style={{ color: "var(--text-muted)" }}
+          className="absolute top-4 right-4 hover:text-gray-600 text-xl"
         >
           ✕
         </button>
@@ -39,9 +40,16 @@ export default function WordDetailModal({ word, onClose }: Props) {
         {/* Header */}
         <div className="flex items-center gap-3 mb-4">
           <div>
-            <h2 className="text-2xl font-bold">{word.word}</h2>
+            <h2
+              style={{ color: "var(--text-primary)" }}
+              className="text-2xl font-bold"
+            >
+              {word.word}
+            </h2>
             {word.pronunciation && (
-              <p className="text-sm text-gray-400">/{word.pronunciation}/</p>
+              <p style={{ color: "var(--text-muted)" }} className="text-sm">
+                /{word.pronunciation}/
+              </p>
             )}
           </div>
           <button
@@ -68,22 +76,35 @@ export default function WordDetailModal({ word, onClose }: Props) {
 
         {/* Meaning */}
         <div className="mb-4">
-          <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">Meaning</p>
-          <p className="text-gray-700">{word.meaning}</p>
+          <p className="text-xs font-semibold text-sky-400 uppercase tracking-wider mb-1">
+            Meaning
+          </p>
+          <p style={{ color: "var(--text-secondary)" }} className="text-sm">
+            {word.meaning}
+          </p>
         </div>
 
         {/* Example sentence */}
         {word.sentence && (
           <div className="mb-4">
-            <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">Example</p>
-            <p className="text-gray-600 italic text-sm">&ldquo;{word.sentence}&rdquo;</p>
+            <p className="text-xs font-semibold text-sky-400 uppercase tracking-wider mb-1">
+              Example
+            </p>
+            <p
+              style={{ color: "var(--text-muted)" }}
+              className="italic text-sm"
+            >
+              &ldquo;{word.sentence}&rdquo;
+            </p>
           </div>
         )}
 
         {/* Synonyms */}
         {word.synonyms && word.synonyms.length > 0 && (
           <div className="mb-4">
-            <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Synonyms</p>
+            <p className="text-xs font-semibold text-sky-400 uppercase tracking-wider mb-2">
+              Synonyms
+            </p>
             <div className="flex flex-wrap gap-2">
               {word.synonyms.map((syn) => (
                 <span
@@ -100,8 +121,12 @@ export default function WordDetailModal({ word, onClose }: Props) {
         {/* When to say */}
         {word.when_to_say && (
           <div>
-            <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">When to use</p>
-            <p className="text-gray-600 text-sm">{word.when_to_say}</p>
+            <p className="text-xs font-semibold text-sky-400 uppercase tracking-wider mb-1">
+              When to use
+            </p>
+            <p style={{ color: "var(--text-muted)" }} className="text-sm">
+              {word.when_to_say}
+            </p>
           </div>
         )}
       </div>

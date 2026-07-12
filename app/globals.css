@@ -8,3 +8,33 @@
 .font-bangla {
   font-family: var(--font-hind-siliguri), sans-serif;
 }
+
+/* Light mode tokens */
+:root {
+  --bg-page: #f8fafc;
+  --bg-card: #ffffff;
+  --bg-header: #BADEFF26;
+  --text-primary: #18181b;
+  --text-secondary: #64748b;
+  --text-muted: #94a3b8;
+  --border-color: #e2e8f0;
+  --badge-bg: #f0f9ff;
+}
+
+/* Dark mode tokens */
+html.dark {
+  --bg-page: #0f172a;
+  --bg-card: #1e293b;
+  --bg-header: #1e293b;
+  --text-primary: #e2e8f0;
+  --text-secondary: #94a3b8;
+  --text-muted: #64748b;
+  --border-color: #334155;
+  --badge-bg: #0f172a;
+}
+
+body {
+  background-color: var(--bg-page);
+  color: var(--text-primary);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}

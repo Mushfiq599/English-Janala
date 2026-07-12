@@ -57,10 +57,13 @@ export default function FAQPage() {
       <section className="w-11/12 max-w-3xl mx-auto py-16">
         {/* Hero */}
         <div className="text-center mb-12">
-          <h1 className="text-3xl font-bold mb-3">
+          <h1
+            style={{ color: "var(--text-primary)" }}
+            className="text-3xl font-bold mb-3"
+          >
             Frequently Asked Questions
           </h1>
-          <p className="text-gray-500">
+          <p style={{ color: "var(--text-secondary)" }}>
             Everything you need to know about English Janala
           </p>
         </div>
@@ -70,11 +73,16 @@ export default function FAQPage() {
           {faqs.map((faq, i) => (
             <div
               key={i}
-              className="bg-white border border-gray-100 rounded-2xl shadow-sm overflow-hidden"
+              style={{
+                backgroundColor: "var(--bg-card)",
+                borderColor: "var(--border-color)",
+              }}
+              className="border rounded-2xl shadow-sm overflow-hidden"
             >
               <button
                 onClick={() => toggle(i)}
-                className="w-full flex items-center justify-between px-6 py-4 text-left font-semibold text-gray-800 hover:bg-sky-50 transition"
+                style={{ color: "var(--text-primary)" }}
+                className="w-full flex items-center justify-between px-6 py-4 text-left font-semibold hover:bg-sky-50 transition"
               >
                 <span>{faq.question}</span>
                 <span
@@ -87,7 +95,8 @@ export default function FAQPage() {
               </button>
 
               <div
-                className={`px-6 text-sm text-gray-600 leading-relaxed transition-all duration-300 ease-in-out ${
+                style={{ color: "var(--text-secondary)" }}
+                className={`px-6 text-sm leading-relaxed transition-all duration-300 ease-in-out ${
                   openIndex === i
                     ? "max-h-40 py-4 opacity-100"
                     : "max-h-0 py-0 opacity-0"
@@ -100,9 +109,20 @@ export default function FAQPage() {
         </div>
 
         {/* CTA */}
-        <div className="mt-14 bg-sky-50 rounded-2xl p-8 text-center">
-          <h2 className="text-xl font-bold mb-2">Still have questions?</h2>
-          <p className="text-gray-500 text-sm mb-6">
+        <div
+          style={{ backgroundColor: "var(--badge-bg)" }}
+          className="mt-14 rounded-2xl p-8 text-center"
+        >
+          <h2
+            style={{ color: "var(--text-primary)" }}
+            className="text-xl font-bold mb-2"
+          >
+            Still have questions?
+          </h2>
+          <p
+            style={{ color: "var(--text-secondary)" }}
+            className="text-sm mb-6"
+          >
             Can&apos;t find what you&apos;re looking for? Reach out and we&apos;ll get back to you.
           </p>
           <a
