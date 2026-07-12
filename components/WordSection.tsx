@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { Word } from "@/types/word";
 import { getWordsByLevel } from "@/lib/api";
 import WordCard from "@/components/WordCard";
+import { motion } from "framer-motion";
 
 interface Props {
   levelId: string;
@@ -42,21 +43,46 @@ export default function WordSection({ levelId }: Props) {
 
   if (words.length === 0) {
     return (
-      <div className="flex flex-col items-center py-20 text-gray-400">
+      <div className="flex flex-col items-center py-20">
         <span className="text-4xl mb-3">🔍</span>
-        <p>No words found for this lesson.</p>
+        <p style={{ color: "var(--text-muted)" }}>
+          No words found for this lesson.
+        </p>
       </div>
     );
   }
 
   return (
     <div>
-      <p className="text-sm text-gray-500 mb-6">{words.length} words in this lesson</p>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+      <p style={{ color: "var(--text-muted)" }} className="text-sm mb-6">
+        {words.length} words in this lesson
+      </p>
+      <motion.div
+        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"
+        initial="hidden"
+        animate="visible"
+        variants={{
+          hidden: {},
+          visible: {
+            transition: {
+              staggerChildren: 0.06,
+            },
+          },
+        }}
+      >
         {words.map((word) => (
-          <WordCard key={word.id} word={word} levelId={levelId} />
+          <motion.div
+            key={word.id}
+            variants={{
+              hidden: { opacity: 0, y: 24 },
+              visible: { opacity: 1, y: 0 },
+            }}
+            transition={{ duration: 0.35, ease: "easeOut" }}
+          >
+            <WordCard word={word} levelId={levelId} />
+          </motion.div>
         ))}
-      </div>
+      </motion.div>
     </div>
   );
 }
