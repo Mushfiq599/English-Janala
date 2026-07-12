@@ -3,6 +3,8 @@ import { Poppins, Hind_Siliguri } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/context/AuthContext";
 import { ThemeProvider } from "@/context/ThemeContext";
+import ThemeWrapper from "@/components/shared/ThemeWrapper";
+import { ProfileProvider } from "@/context/ProfileContext";
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -31,7 +33,12 @@ export default function RootLayout({
         className={`${poppins.variable} ${hindSiliguri.variable} font-sans antialiased`}
       >
         <ThemeProvider>
-          <AuthProvider>{children}</AuthProvider>
+          <AuthProvider>
+            <ProfileProvider>
+              <ThemeWrapper />
+              {children}
+            </ProfileProvider>
+          </AuthProvider>
         </ThemeProvider>
       </body>
     </html>

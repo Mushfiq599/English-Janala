@@ -9,20 +9,26 @@
   font-family: var(--font-hind-siliguri), sans-serif;
 }
 
-/* Light mode tokens */
-:root {
+/* ─── SCHOLAR THEME (18+) — default ─── */
+:root,
+html.theme-scholar {
   --bg-page: #f8fafc;
   --bg-card: #ffffff;
-  --bg-header: #BADEFF26;
-  --text-primary: #18181b;
-  --text-secondary: #64748b;
+  --bg-header: rgba(186, 222, 255, 0.15);
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
   --text-muted: #94a3b8;
   --border-color: #e2e8f0;
+  --accent: #0ea5e9;
+  --accent-hover: #0284c7;
+  --accent-soft: #f0f9ff;
   --badge-bg: #f0f9ff;
+  --success: #22c55e;
+  --font-display: var(--font-poppins), sans-serif;
+  --radius-card: 1rem;
 }
 
-/* Dark mode tokens */
-html.dark {
+html.theme-scholar.dark {
   --bg-page: #0f172a;
   --bg-card: #1e293b;
   --bg-header: #1e293b;
@@ -30,11 +36,66 @@ html.dark {
   --text-secondary: #94a3b8;
   --text-muted: #64748b;
   --border-color: #334155;
-  --badge-bg: #0f172a;
+  --accent-soft: #0f172a;
+  --badge-bg: #1e293b;
 }
 
+/* ─── TEEN THEME (13–17) ─── */
+html.theme-teen {
+  --bg-page: #0f172a;
+  --bg-card: #1e293b;
+  --bg-header: #1e293b;
+  --text-primary: #e2e8f0;
+  --text-secondary: #94a3b8;
+  --text-muted: #64748b;
+  --border-color: #334155;
+  --accent: #06b6d4;
+  --accent-hover: #0891b2;
+  --accent-soft: #164e63;
+  --badge-bg: #0f172a;
+  --success: #10b981;
+  --font-display: var(--font-poppins), sans-serif;
+  --radius-card: 1rem;
+}
+
+html.theme-teen.dark {
+  --bg-page: #020617;
+  --bg-card: #0f172a;
+  --bg-header: #0f172a;
+  --border-color: #1e293b;
+}
+
+/* ─── KIDS THEME (5–12) ─── */
+html.theme-kids {
+  --bg-page: #fff8e7;
+  --bg-card: #ffffff;
+  --bg-header: #fef3c7;
+  --text-primary: #1c1917;
+  --text-secondary: #44403c;
+  --text-muted: #78716c;
+  --border-color: #fde68a;
+  --accent: #f59e0b;
+  --accent-hover: #d97706;
+  --accent-soft: #fef9c3;
+  --badge-bg: #fef3c7;
+  --success: #22c55e;
+  --font-display: var(--font-poppins), sans-serif;
+  --radius-card: 1.5rem;
+}
+
+html.theme-kids.dark {
+  --bg-page: #1c1917;
+  --bg-card: #292524;
+  --bg-header: #292524;
+  --text-primary: #fef3c7;
+  --text-secondary: #d6d3d1;
+  --text-muted: #a8a29e;
+  --border-color: #44403c;
+}
+
+/* ─── Global base styles ─── */
 body {
   background-color: var(--bg-page);
   color: var(--text-primary);
-  transition: background-color 0.3s ease, color 0.3s ease;
+  transition: background-color 0.4s ease, color 0.4s ease;
 }

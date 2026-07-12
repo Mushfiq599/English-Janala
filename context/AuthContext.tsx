@@ -9,6 +9,7 @@ import {
 } from "react";
 import {
   User,
+  UserCredential,
   onAuthStateChanged,
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
@@ -21,9 +22,9 @@ import { auth } from "@/lib/firebase";
 interface AuthContextType {
   user: User | null;
   loading: boolean;
-  signUp: (email: string, password: string) => Promise<void>;
+  signUp: (email: string, password: string) => Promise<UserCredential>;
   logIn: (email: string, password: string) => Promise<void>;
-  logInWithGoogle: () => Promise<void>;
+  logInWithGoogle: () => Promise<UserCredential>;
   logOut: () => Promise<void>;
 }
 
@@ -41,20 +42,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return unsubscribe;
   }, []);
 
-  const signUp = async (email: string, password: string) => {
-    await createUserWithEmailAndPassword(auth, email, password);
+  const signUp = async (
+    email: string,
+    password: string
+  ): Promise<UserCredential> => {
+    return createUserWithEmailAndPassword(auth, email, password);
   };
 
-  const logIn = async (email: string, password: string) => {
+  const logIn = async (email: string, password: string): Promise<void> => {
     await signInWithEmailAndPassword(auth, email, password);
   };
 
-  const logInWithGoogle = async () => {
+  const logInWithGoogle = async (): Promise<UserCredential> => {
     const provider = new GoogleAuthProvider();
-    await signInWithPopup(auth, provider);
+    return signInWithPopup(auth, provider);
   };
 
-  const logOut = async () => {
+  const logOut = async (): Promise<void> => {
     await signOut(auth);
   };
 
