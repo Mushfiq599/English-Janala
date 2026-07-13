@@ -7,6 +7,7 @@ import { saveWord, removeSavedWord } from "@/lib/savedWords";
 import { markWordSeen } from "@/lib/progress";
 import { useAuth } from "@/context/AuthContext";
 import WordDetailModal from "@/components/WordDetailModal";
+import { FiVolume2, FiStar, FiInfo } from "react-icons/fi";
 
 interface Props {
   word: Word;
@@ -52,17 +53,11 @@ export default function WordCard({ word, levelId }: Props) {
         {/* Word + pronounce */}
         <div className="flex items-start justify-between">
           <div>
-            <h3
-              style={{ color: "var(--text-primary)" }}
-              className="text-lg font-bold"
-            >
+            <h3 style={{ color: "var(--text-primary)" }} className="text-lg font-bold">
               {word.word}
             </h3>
             {word.pronunciation && (
-              <p
-                style={{ color: "var(--text-muted)" }}
-                className="text-xs mt-0.5"
-              >
+              <p style={{ color: "var(--text-muted)" }} className="text-xs mt-0.5">
                 /{word.pronunciation}/
               </p>
             )}
@@ -70,23 +65,27 @@ export default function WordCard({ word, levelId }: Props) {
           <button
             onClick={() => pronounceWord(word.word)}
             title="Pronounce"
-            className="text-sky-400 hover:text-sky-600 transition text-xl"
+            style={{ color: "var(--accent)" }}
+            className="hover:opacity-70 transition p-1"
           >
-            🔊
+            <FiVolume2 size={20} />
           </button>
         </div>
 
         {/* Meaning */}
-        <p
-          style={{ color: "var(--text-secondary)" }}
-          className="text-sm leading-relaxed line-clamp-2"
-        >
+        <p style={{ color: "var(--text-secondary)" }} className="text-sm leading-relaxed line-clamp-2">
           {word.meaning}
         </p>
 
         {/* Parts of speech badge */}
         {word.partsOfSpeech && (
-          <span className="self-start text-xs bg-sky-50 text-sky-600 px-2 py-0.5 rounded-full font-medium">
+          <span
+            style={{
+              backgroundColor: "var(--accent-soft)",
+              color: "var(--accent)",
+            }}
+            className="self-start text-xs px-2 py-0.5 rounded-full font-medium"
+          >
             {word.partsOfSpeech}
           </span>
         )}
@@ -98,8 +97,13 @@ export default function WordCard({ word, levelId }: Props) {
         >
           <button
             onClick={() => setModalOpen(true)}
-            className="flex-1 text-sm font-medium py-1.5 rounded-lg bg-sky-50 hover:bg-sky-100 text-sky-600 transition"
+            style={{
+              backgroundColor: "var(--accent-soft)",
+              color: "var(--accent)",
+            }}
+            className="flex-1 flex items-center justify-center gap-1.5 text-sm font-medium py-1.5 rounded-lg hover:opacity-80 transition"
           >
+            <FiInfo size={14} />
             Details
           </button>
           {user && (
@@ -107,13 +111,13 @@ export default function WordCard({ word, levelId }: Props) {
               onClick={handleSave}
               disabled={saving}
               title={saved ? "Remove from saved" : "Save word"}
-              className={`px-3 py-1.5 rounded-lg text-sm transition ${
-                saved
-                  ? "bg-yellow-50 text-yellow-500 hover:bg-yellow-100"
-                  : "bg-gray-50 text-gray-400 hover:bg-gray-100"
-              }`}
+              style={{
+                backgroundColor: saved ? "#fef9c3" : "var(--bg-page)",
+                color: saved ? "#f59e0b" : "var(--text-muted)",
+              }}
+              className="p-2 rounded-lg hover:opacity-80 transition"
             >
-              {saved ? "★" : "☆"}
+              <FiStar size={16} fill={saved ? "#f59e0b" : "none"} />
             </button>
           )}
         </div>

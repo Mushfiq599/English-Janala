@@ -5,17 +5,20 @@ import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
 import { useTheme } from "@/context/ThemeContext";
 import { useRouter } from "next/navigation";
+import { FiSun, FiMoon, FiMenu, FiX, FiLogOut, FiLogIn, FiBookOpen, FiStar, FiHelpCircle } from "react-icons/fi";
+import { useState } from "react";
 
 const navLinks = [
-  { label: "FAQ", href: "/faq" },
-  { label: "Learn", href: "/lesson" },
-  { label: "Saved Words", href: "/saved" },
+  { label: "FAQ", href: "/faq", icon: <FiHelpCircle /> },
+  { label: "Learn", href: "/lesson", icon: <FiBookOpen /> },
+  { label: "Saved Words", href: "/saved", icon: <FiStar /> },
 ];
 
 export default function Header() {
   const { user, logOut } = useAuth();
   const { dark, toggleDark } = useTheme();
   const router = useRouter();
+  const [mobileOpen, setMobileOpen] = useState(false);
 
   const handleLogout = async () => {
     await logOut();
@@ -23,28 +26,25 @@ export default function Header() {
   };
 
   return (
-    <header style={{ backgroundColor: "var(--bg-header)" }} className="shadow-sm">
+    <header style={{ backgroundColor: "var(--bg-header)" }} className="shadow-sm sticky top-0 z-50">
       <div className="flex items-center justify-between w-11/12 mx-auto py-3">
         {/* Logo */}
         <Link href="/" className="flex items-center gap-1">
-          <span className="text-lg font-bold">English</span>
-          <Image
-            src="/assets/logo.png"
-            alt="English Janala logo"
-            width={28}
-            height={28}
-          />
-          <span className="font-bangla text-lg font-semibold">জানালা</span>
+          <span style={{ color: "var(--text-primary)" }} className="text-lg font-bold">English</span>
+          <Image src="/assets/logo.png" alt="English Janala logo" width={28} height={28} />
+          <span style={{ color: "var(--text-primary)" }} className="font-bangla text-lg font-semibold">জানালা</span>
         </Link>
 
         {/* Desktop nav */}
-        <nav className="hidden lg:flex items-center gap-3">
+        <nav className="hidden lg:flex items-center gap-1">
           {navLinks.map((link) => (
             <Link
               key={link.href}
               href={link.href}
-              className="text-sm font-medium px-4 py-2 rounded-lg hover:bg-sky-100 transition"
+              style={{ color: "var(--text-secondary)" }}
+              className="flex items-center gap-1.5 text-sm font-medium px-4 py-2 rounded-lg hover:bg-sky-100 transition"
             >
+              {link.icon}
               {link.label}
             </Link>
           ))}
@@ -53,60 +53,101 @@ export default function Header() {
           <button
             onClick={toggleDark}
             title="Toggle dark mode"
-            className="w-9 h-9 flex items-center justify-center rounded-lg hover:bg-sky-100 transition text-lg"
+            style={{ color: "var(--text-secondary)" }}
+            className="w-9 h-9 flex items-center justify-center rounded-lg hover:bg-sky-100 transition text-lg ml-1"
           >
-            {dark ? "☀️" : "🌙"}
+            {dark ? <FiSun size={18} /> : <FiMoon size={18} />}
           </button>
 
           {user ? (
             <div className="flex items-center gap-3 ml-2">
-              <span className="text-sm text-gray-600 truncate max-w-[160px]">
+              <span style={{ color: "var(--text-muted)" }} className="text-sm truncate max-w-[160px]">
                 {user.email}
               </span>
               <button
                 onClick={handleLogout}
-                className="text-sm font-medium px-4 py-2 bg-sky-500 hover:bg-sky-600 text-white rounded-lg transition"
+                style={{ backgroundColor: "var(--accent)" }}
+                className="flex items-center gap-1.5 text-sm font-medium px-4 py-2 text-white rounded-lg hover:opacity-90 transition"
               >
+                <FiLogOut size={15} />
                 Logout
               </button>
             </div>
           ) : (
             <Link
               href="/login"
-              className="text-sm font-medium px-4 py-2 bg-sky-500 hover:bg-sky-600 text-white rounded-lg transition"
+              style={{ backgroundColor: "var(--accent)" }}
+              className="flex items-center gap-1.5 text-sm font-medium px-4 py-2 text-white rounded-lg hover:opacity-90 transition ml-2"
             >
+              <FiLogIn size={15} />
               Login
             </Link>
           )}
         </nav>
 
-        {/* Mobile menu */}
+        {/* Mobile right side */}
         <div className="lg:hidden flex items-center gap-2">
           <button
             onClick={toggleDark}
-            className="w-9 h-9 flex items-center justify-center rounded-lg hover:bg-sky-100 transition text-lg"
+            style={{ color: "var(--text-secondary)" }}
+            className="w-9 h-9 flex items-center justify-center rounded-lg hover:bg-sky-100 transition"
           >
-            {dark ? "☀️" : "🌙"}
+            {dark ? <FiSun size={18} /> : <FiMoon size={18} />}
           </button>
-          <details className="dropdown dropdown-end">
-            <summary className="btn btn-ghost">☰</summary>
-            <ul className="menu menu-sm dropdown-content bg-white rounded-box z-10 mt-3 w-52 p-2 shadow">
-              {navLinks.map((link) => (
-                <li key={link.href}>
-                  <Link href={link.href}>{link.label}</Link>
-                </li>
-              ))}
-              <li>
-                {user ? (
-                  <button onClick={handleLogout}>Logout</button>
-                ) : (
-                  <Link href="/login">Login</Link>
-                )}
-              </li>
-            </ul>
-          </details>
+          <button
+            onClick={() => setMobileOpen(!mobileOpen)}
+            style={{ color: "var(--text-secondary)" }}
+            className="w-9 h-9 flex items-center justify-center rounded-lg hover:bg-sky-100 transition"
+          >
+            {mobileOpen ? <FiX size={20} /> : <FiMenu size={20} />}
+          </button>
         </div>
       </div>
+
+      {/* Mobile drawer */}
+      {mobileOpen && (
+        <div
+          style={{
+            backgroundColor: "var(--bg-card)",
+            borderColor: "var(--border-color)",
+          }}
+          className="lg:hidden border-t px-6 py-4 flex flex-col gap-2"
+        >
+          {navLinks.map((link) => (
+            <Link
+              key={link.href}
+              href={link.href}
+              onClick={() => setMobileOpen(false)}
+              style={{ color: "var(--text-secondary)" }}
+              className="flex items-center gap-2 text-sm font-medium py-2.5 px-3 rounded-lg hover:bg-sky-50 transition"
+            >
+              {link.icon}
+              {link.label}
+            </Link>
+          ))}
+          <div style={{ borderColor: "var(--border-color)" }} className="border-t my-1" />
+          {user ? (
+            <button
+              onClick={handleLogout}
+              style={{ color: "var(--text-secondary)" }}
+              className="flex items-center gap-2 text-sm font-medium py-2.5 px-3 rounded-lg hover:bg-sky-50 transition text-left"
+            >
+              <FiLogOut size={15} />
+              Logout
+            </button>
+          ) : (
+            <Link
+              href="/login"
+              onClick={() => setMobileOpen(false)}
+              style={{ color: "var(--accent)" }}
+              className="flex items-center gap-2 text-sm font-medium py-2.5 px-3 rounded-lg hover:bg-sky-50 transition"
+            >
+              <FiLogIn size={15} />
+              Login
+            </Link>
+          )}
+        </div>
+      )}
     </header>
   );
 }
