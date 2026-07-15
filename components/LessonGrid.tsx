@@ -4,15 +4,26 @@ import { useState, useEffect } from "react";
 import { Lesson } from "@/types/word";
 import WordSection from "@/components/WordSection";
 import { useAuth } from "@/context/AuthContext";
+import { useProfile } from "@/context/ProfileContext";
 import { getAllLessonsProgress } from "@/lib/progress";
+import LessonPinButton from "@/components/lesson/LessonPinButton";
+import ScholarBadge from "@/components/shared/ScholarBadge";
 import { motion } from "framer-motion";
+import { FiBookOpen } from "react-icons/fi";
 
 interface Props {
   lessons: Lesson[];
 }
 
+const scholarBadgeMap: Record<number, "IELTS" | "TOEFL" | "Advanced"> = {
+  5: "Advanced",
+  6: "IELTS",
+  7: "TOEFL",
+};
+
 export default function LessonGrid({ lessons }: Props) {
   const { user } = useAuth();
+  const { themeTier } = useProfile();
   const [activeLevelNo, setActiveLevelNo] = useState<number | null>(null);
   const [progress, setProgress] = useState<Record<string, number>>({});
 
@@ -22,62 +33,92 @@ export default function LessonGrid({ lessons }: Props) {
     getAllLessonsProgress(user.uid, levelIds).then(setProgress);
   }, [user, lessons]);
 
+  const isKidsOrTeen = themeTier === "kids" || themeTier === "teen";
+
   return (
     <div>
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-3 mb-10">
-        {lessons.map((lesson, i) => {
-          const seen = progress[String(lesson.level_no)] ?? 0;
-          const isActive = activeLevelNo === lesson.level_no;
+      {/* Section title for kids */}
+      {themeTier === "kids" && (
+        <div className="text-center mb-8">
+          <p
+            style={{ color: "var(--text-secondary)" }}
+            className="text-base font-medium"
+          >
+            Pick a location on the map to start your adventure!
+          </p>
+        </div>
+      )}
 
-          return (
-            <motion.button
-              key={lesson.id}
-              onClick={() => setActiveLevelNo(lesson.level_no)}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3, delay: i * 0.05 }}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.97 }}
-              className={`rounded-xl py-3 px-2 text-sm font-semibold transition border-2 flex flex-col items-center gap-1 ${
-                isActive
-                  ? "bg-sky-500 text-white border-sky-500 shadow-md"
-                  : "bg-white border-sky-200 text-sky-600 hover:border-sky-400 hover:bg-sky-50"
-              }`}
-            >
-              <span>{lesson.lessonName}</span>
-              {user && seen > 0 && (
-                <span
-                  className={`text-xs font-normal px-2 py-0.5 rounded-full ${
-                    isActive
-                      ? "bg-white/20 text-white"
-                      : "bg-sky-100 text-sky-500"
-                  }`}
-                >
-                  {seen} seen
-                </span>
-              )}
-            </motion.button>
-          );
-        })}
+      {/* Map-style background for kids */}
+      <div
+        style={
+          themeTier === "kids"
+            ? {
+                backgroundColor: "#fef9c3",
+                borderColor: "#fde68a",
+                borderRadius: "1.5rem",
+                border: "2px dashed #fde68a",
+              }
+            : themeTier === "teen"
+            ? {
+                backgroundColor: "#0f172a",
+                borderRadius: "1rem",
+              }
+            : {}
+        }
+        className={`${isKidsOrTeen ? "p-6 mb-10" : "mb-10"}`}
+      >
+        <div
+          className={`grid gap-4 ${
+            isKidsOrTeen
+              ? "grid-cols-3 sm:grid-cols-4 md:grid-cols-7"
+              : "grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7"
+          }`}
+        >
+          {lessons.map((lesson, i) => {
+            const seen = progress[String(lesson.level_no)] ?? 0;
+
+            return (
+              <div key={lesson.id} className="flex flex-col items-center gap-1">
+                <LessonPinButton
+                  label={lesson.lessonName}
+                  seen={seen}
+                  isActive={activeLevelNo === lesson.level_no}
+                  onClick={() => setActiveLevelNo(lesson.level_no)}
+                  tier={themeTier}
+                  index={i}
+                />
+                {/* Scholar badge for advanced levels */}
+                {themeTier === "scholar" && scholarBadgeMap[lesson.level_no] && (
+                  <ScholarBadge type={scholarBadgeMap[lesson.level_no]} />
+                )}
+              </div>
+            );
+          })}
+        </div>
       </div>
 
+      {/* Word section */}
       {activeLevelNo ? (
         <WordSection levelId={String(activeLevelNo)} />
       ) : (
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          className="flex flex-col items-center justify-center py-20 text-center"
+          className="flex flex-col items-center justify-center py-20 text-center gap-4"
         >
-          <span className="text-5xl mb-4">📖</span>
-          <p
-            style={{ color: "var(--text-primary)" }}
-            className="text-lg font-medium"
-          >
-            Select a lesson to start learning
+          <FiBookOpen size={48} style={{ color: "var(--text-muted)" }} />
+          <p style={{ color: "var(--text-primary)" }} className="text-lg font-medium">
+            {themeTier === "kids"
+              ? "Pick a location on the map above!"
+              : themeTier === "teen"
+              ? "Select a lesson to start learning"
+              : "Select a lesson to begin"}
           </p>
-          <p style={{ color: "var(--text-muted)" }} className="text-sm mt-1">
-            Choose any lesson above to see its vocabulary words
+          <p style={{ color: "var(--text-muted)" }} className="text-sm">
+            {themeTier === "scholar"
+              ? "Advanced lessons 5–7 cover IELTS and TOEFL vocabulary"
+              : "Each lesson has words, meanings, and pronunciation"}
           </p>
         </motion.div>
       )}
