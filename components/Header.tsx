@@ -5,12 +5,13 @@ import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
 import { useTheme } from "@/context/ThemeContext";
 import { useRouter } from "next/navigation";
-import { FiSun, FiMoon, FiMenu, FiX, FiLogOut, FiLogIn, FiBookOpen, FiStar, FiHelpCircle } from "react-icons/fi";
+import { FiSun, FiMoon, FiMenu, FiX, FiLogOut, FiLogIn, FiBookOpen, FiStar, FiHelpCircle, FiTarget } from "react-icons/fi";
 import { useState } from "react";
 
 const navLinks = [
   { label: "FAQ", href: "/faq", icon: <FiHelpCircle /> },
   { label: "Learn", href: "/lesson", icon: <FiBookOpen /> },
+  { label: "Quiz", href: "/quiz", icon: <FiTarget /> },
   { label: "Saved Words", href: "/saved", icon: <FiStar /> },
 ];
 
