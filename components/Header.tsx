@@ -5,14 +5,18 @@ import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
 import { useTheme } from "@/context/ThemeContext";
 import { useRouter } from "next/navigation";
-import { FiSun, FiMoon, FiMenu, FiX, FiLogOut, FiLogIn, FiBookOpen, FiStar, FiHelpCircle, FiTarget } from "react-icons/fi";
+import {
+  FiSun, FiMoon, FiMenu, FiX, FiLogOut, FiLogIn,
+  FiBookOpen, FiStar, FiHelpCircle, FiTarget, FiAward, FiUser
+} from "react-icons/fi";
 import { useState } from "react";
 
 const navLinks = [
   { label: "FAQ", href: "/faq", icon: <FiHelpCircle /> },
   { label: "Learn", href: "/lesson", icon: <FiBookOpen /> },
   { label: "Quiz", href: "/quiz", icon: <FiTarget /> },
-  { label: "Saved Words", href: "/saved", icon: <FiStar /> },
+  { label: "Saved", href: "/saved", icon: <FiStar /> },
+  { label: "Leaderboard", href: "/leaderboard", icon: <FiAward /> },
 ];
 
 export default function Header() {
@@ -61,10 +65,15 @@ export default function Header() {
           </button>
 
           {user ? (
-            <div className="flex items-center gap-3 ml-2">
-              <span style={{ color: "var(--text-muted)" }} className="text-sm truncate max-w-[160px]">
-                {user.email}
-              </span>
+            <div className="flex items-center gap-2 ml-2">
+              <Link
+                href="/profile"
+                style={{ color: "var(--text-secondary)", borderColor: "var(--border-color)" }}
+                className="flex items-center gap-1.5 text-sm font-medium px-3 py-2 border rounded-lg hover:opacity-80 transition"
+              >
+                <FiUser size={15} />
+                Profile
+              </Link>
               <button
                 onClick={handleLogout}
                 style={{ backgroundColor: "var(--accent)" }}
@@ -126,6 +135,15 @@ export default function Header() {
               {link.label}
             </Link>
           ))}
+          <Link
+            href="/profile"
+            onClick={() => setMobileOpen(false)}
+            style={{ color: "var(--text-secondary)" }}
+            className="flex items-center gap-2 text-sm font-medium py-2.5 px-3 rounded-lg hover:bg-sky-50 transition"
+          >
+            <FiUser size={15} />
+            Profile
+          </Link>
           <div style={{ borderColor: "var(--border-color)" }} className="border-t my-1" />
           {user ? (
             <button
