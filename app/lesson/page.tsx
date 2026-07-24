@@ -2,6 +2,13 @@ import { getLessons } from "@/lib/api";
 import Header from "@/components/Header";
 import LessonGrid from "@/components/LessonGrid";
 import SiteFooter from "@/components/layout/Footer";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "All Lessons",
+  description:
+    "Browse all English vocabulary lessons from Basic to IELTS and TOEFL level. Learn words with meanings, pronunciation, and examples.",
+};
 
 export default async function LessonPage() {
   const lessons = await getLessons();
