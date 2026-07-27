@@ -6,6 +6,10 @@ import { useAuth } from "@/context/AuthContext";
 import { useProfile } from "@/context/ProfileContext";
 import { getUserStats, UserStats } from "@/lib/userStats";
 import { updateLeaderboardEntry } from "@/lib/leaderboard";
+import {
+    createUserProfile,
+    calculateAge,
+} from "@/lib/userProfile";
 import Header from "@/components/Header";
 import SiteFooter from "@/components/layout/Footer";
 import { motion } from "framer-motion";
@@ -20,7 +24,8 @@ import {
     FiAlertCircle,
 } from "react-icons/fi";
 
-const tierLabels: Record<string, { label: string; color: string; bg: string }> = {
+const tierLabels: Record<string, { label: string; color: string; bg: string }> =
+{
     kids: { label: "Young Explorer", color: "#f59e0b", bg: "#fef9c3" },
     teen: { label: "Teen Explorer", color: "#06b6d4", bg: "#cffafe" },
     scholar: { label: "Scholar", color: "#0ea5e9", bg: "#f0f9ff" },
@@ -28,24 +33,37 @@ const tierLabels: Record<string, { label: string; color: string; bg: string }> =
 
 export default function ProfilePage() {
     const { user, loading: authLoading } = useAuth();
-    const { profile, themeTier, loading: profileLoading } = useProfile();
+    const { profile, themeTier, loading: profileLoading, refreshProfile } = useProfile();
     const router = useRouter();
 
     const [stats, setStats] = useState<UserStats | null>(null);
     const [statsLoading, setStatsLoading] = useState(true);
     const [statsError, setStatsError] = useState(false);
 
+    // Profile setup form state
+    const [setupName, setSetupName] = useState("");
+    const [setupDOB, setSetupDOB] = useState("");
+    const [setupLoading, setSetupLoading] = useState(false);
+    const [setupError, setSetupError] = useState("");
+
+    const today = new Date().toISOString().split("T")[0];
+    const minDate = new Date(
+        new Date().setFullYear(new Date().getFullYear() - 100)
+    )
+        .toISOString()
+        .split("T")[0];
+
     useEffect(() => {
         if (!authLoading && !user) router.push("/login");
     }, [user, authLoading, router]);
 
+    // Load stats independently of profile
     useEffect(() => {
-        if (!user || !profile) return;
+        if (!user) return;
 
         setStatsLoading(true);
         setStatsError(false);
 
-        // 10 second timeout so page never hangs forever
         const timeout = setTimeout(() => {
             setStatsLoading(false);
             setStatsError(true);
@@ -55,14 +73,15 @@ export default function ProfilePage() {
             .then(async (s) => {
                 clearTimeout(timeout);
                 setStats(s);
-                // Update leaderboard in background — don't block UI
-                updateLeaderboardEntry(
-                    user.uid,
-                    profile.name,
-                    s.totalWordsSeen,
-                    s.lessonsCompleted,
-                    themeTier
-                ).catch(() => { });
+                if (profile) {
+                    updateLeaderboardEntry(
+                        user.uid,
+                        profile.name,
+                        s.totalWordsSeen,
+                        s.lessonsCompleted,
+                        themeTier
+                    ).catch(() => { });
+                }
             })
             .catch(() => {
                 clearTimeout(timeout);
@@ -74,9 +93,41 @@ export default function ProfilePage() {
             });
 
         return () => clearTimeout(timeout);
-    }, [user, profile, themeTier]);
+    }, [user]);
 
-    // Only block render on auth loading — not on stats
+    const handleSetup = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setSetupError("");
+        if (!setupName.trim()) {
+            setSetupError("Please enter your name.");
+            return;
+        }
+        if (!setupDOB) {
+            setSetupError("Please enter your date of birth.");
+            return;
+        }
+        const age = calculateAge(setupDOB);
+        if (age < 5) {
+            setSetupError("You must be at least 5 years old.");
+            return;
+        }
+        if (!user) return;
+        setSetupLoading(true);
+        try {
+            await createUserProfile(
+                user.uid,
+                setupName,
+                user.email ?? "",
+                setupDOB
+            );
+            await refreshProfile();
+        } catch {
+            setSetupError("Could not save profile. Please try again.");
+        } finally {
+            setSetupLoading(false);
+        }
+    };
+
     if (authLoading || profileLoading) {
         return (
             <main>
@@ -84,9 +135,118 @@ export default function ProfilePage() {
                 <div className="flex justify-center items-center py-32">
                     <div
                         className="w-10 h-10 border-4 border-t-transparent rounded-full animate-spin"
-                        style={{ borderColor: "var(--accent)", borderTopColor: "transparent" }}
+                        style={{
+                            borderColor: "var(--accent)",
+                            borderTopColor: "transparent",
+                        }}
                     />
                 </div>
+            </main>
+        );
+    }
+
+    // No profile document — show setup form
+    if (!profile) {
+        return (
+            <main>
+                <Header />
+                <section className="w-11/12 max-w-md mx-auto py-16">
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        style={{
+                            backgroundColor: "var(--bg-card)",
+                            borderColor: "var(--border-color)",
+                        }}
+                        className="border rounded-2xl p-8 shadow-sm"
+                    >
+                        <div
+                            style={{ backgroundColor: "var(--accent)", color: "#fff" }}
+                            className="w-16 h-16 rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-6"
+                        >
+                            {user?.email?.charAt(0).toUpperCase() ?? "U"}
+                        </div>
+                        <h2
+                            style={{ color: "var(--text-primary)" }}
+                            className="text-xl font-bold text-center mb-1"
+                        >
+                            Complete your profile
+                        </h2>
+                        <p
+                            style={{ color: "var(--text-muted)" }}
+                            className="text-sm text-center mb-6"
+                        >
+                            We need a few details to personalize your experience
+                        </p>
+
+                        {setupError && (
+                            <div className="bg-red-50 text-red-600 text-sm rounded-lg px-4 py-3 mb-4">
+                                {setupError}
+                            </div>
+                        )}
+
+                        <form onSubmit={handleSetup} className="space-y-4">
+                            <div>
+                                <label
+                                    style={{ color: "var(--text-primary)" }}
+                                    className="block text-sm font-medium mb-1"
+                                >
+                                    Full Name
+                                </label>
+                                <input
+                                    type="text"
+                                    value={setupName}
+                                    onChange={(e) => setSetupName(e.target.value)}
+                                    placeholder="Your name"
+                                    style={{
+                                        backgroundColor: "var(--bg-page)",
+                                        borderColor: "var(--border-color)",
+                                        color: "var(--text-primary)",
+                                    }}
+                                    className="w-full border rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-sky-400"
+                                    required
+                                />
+                            </div>
+                            <div>
+                                <label
+                                    style={{ color: "var(--text-primary)" }}
+                                    className="block text-sm font-medium mb-1"
+                                >
+                                    Date of Birth
+                                </label>
+                                <input
+                                    type="date"
+                                    value={setupDOB}
+                                    onChange={(e) => setSetupDOB(e.target.value)}
+                                    min={minDate}
+                                    max={today}
+                                    style={{
+                                        backgroundColor: "var(--bg-page)",
+                                        borderColor: "var(--border-color)",
+                                        color: "var(--text-primary)",
+                                    }}
+                                    className="w-full border rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-sky-400"
+                                    required
+                                />
+                                <p
+                                    style={{ color: "var(--text-muted)" }}
+                                    className="text-xs mt-1"
+                                >
+                                    Used to personalize your theme and learning experience
+                                </p>
+                            </div>
+                            <button
+                                type="submit"
+                                disabled={setupLoading}
+                                style={{ backgroundColor: "var(--accent)" }}
+                                className="w-full text-white font-semibold py-2.5 rounded-lg hover:opacity-90 transition disabled:opacity-60"
+                            >
+                                {setupLoading ? "Saving..." : "Save Profile"}
+                            </button>
+                        </form>
+                    </motion.div>
+                </section>
+                <SiteFooter />
             </main>
         );
     }
@@ -128,8 +288,7 @@ export default function ProfilePage() {
         <main>
             <Header />
             <section className="w-11/12 max-w-4xl mx-auto py-10">
-
-                {/* Profile card — shows immediately, no stats needed */}
+                {/* Profile card */}
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -141,22 +300,20 @@ export default function ProfilePage() {
                     className="border rounded-2xl p-8 mb-8 shadow-sm"
                 >
                     <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6">
-                        {/* Avatar */}
                         <div
                             style={{ backgroundColor: "var(--accent)", color: "#fff" }}
                             className="w-20 h-20 rounded-full flex items-center justify-center text-3xl font-bold flex-shrink-0"
                         >
-                            {profile?.name?.charAt(0).toUpperCase() ?? "U"}
+                            {profile.name?.charAt(0).toUpperCase() ?? "U"}
                         </div>
 
-                        {/* Info */}
                         <div className="flex-1 text-center sm:text-left">
                             <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-2">
                                 <h1
                                     style={{ color: "var(--text-primary)" }}
                                     className="text-2xl font-bold"
                                 >
-                                    {profile?.name}
+                                    {profile.name}
                                 </h1>
                                 <span
                                     style={{ backgroundColor: tier.bg, color: tier.color }}
@@ -179,7 +336,7 @@ export default function ProfilePage() {
                                     className="flex items-center gap-1.5 text-sm"
                                 >
                                     <FiCalendar size={14} />
-                                    Age {profile?.age}
+                                    Age {profile.age}
                                 </div>
                                 <div
                                     style={{ color: "var(--text-secondary)" }}
@@ -187,7 +344,7 @@ export default function ProfilePage() {
                                 >
                                     <FiUser size={14} />
                                     Member since{" "}
-                                    {profile?.createdAt
+                                    {profile.createdAt
                                         ? new Date(profile.createdAt).toLocaleDateString("en-US", {
                                             month: "long",
                                             year: "numeric",
@@ -199,7 +356,7 @@ export default function ProfilePage() {
                     </div>
                 </motion.div>
 
-                {/* Stats section */}
+                {/* Stats */}
                 <h2
                     style={{ color: "var(--text-primary)" }}
                     className="text-lg font-bold mb-4"
@@ -290,7 +447,7 @@ export default function ProfilePage() {
                     </div>
                 )}
 
-                {/* Lesson progress bar */}
+                {/* Progress bar */}
                 {!statsLoading && !statsError && stats && (
                     <>
                         <h2
@@ -310,10 +467,16 @@ export default function ProfilePage() {
                             className="border rounded-2xl p-6 shadow-sm"
                         >
                             <div className="flex items-center justify-between mb-2">
-                                <p style={{ color: "var(--text-secondary)" }} className="text-sm">
+                                <p
+                                    style={{ color: "var(--text-secondary)" }}
+                                    className="text-sm"
+                                >
                                     Lessons started
                                 </p>
-                                <p style={{ color: "var(--accent)" }} className="text-sm font-bold">
+                                <p
+                                    style={{ color: "var(--accent)" }}
+                                    className="text-sm font-bold"
+                                >
                                     {stats.lessonsCompleted} / {stats.totalLessons}
                                 </p>
                             </div>
@@ -326,13 +489,20 @@ export default function ProfilePage() {
                                     className="h-full rounded-full"
                                     initial={{ width: 0 }}
                                     animate={{
-                                        width: `${(stats.lessonsCompleted / stats.totalLessons) * 100}%`,
+                                        width: `${(stats.lessonsCompleted / stats.totalLessons) * 100
+                                            }%`,
                                     }}
                                     transition={{ duration: 1, ease: "easeOut", delay: 0.5 }}
                                 />
                             </div>
-                            <p style={{ color: "var(--text-muted)" }} className="text-xs mt-2">
-                                {Math.round((stats.lessonsCompleted / stats.totalLessons) * 100)}% of all lessons explored
+                            <p
+                                style={{ color: "var(--text-muted)" }}
+                                className="text-xs mt-2"
+                            >
+                                {Math.round(
+                                    (stats.lessonsCompleted / stats.totalLessons) * 100
+                                )}
+                                % of all lessons explored
                             </p>
                         </motion.div>
                     </>
