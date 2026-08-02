@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
 import { useTheme } from "@/context/ThemeContext";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import {
   FiSun, FiMoon, FiMenu, FiX, FiLogOut, FiLogIn,
   FiBookOpen, FiStar, FiHelpCircle, FiTarget, FiAward, FiUser
@@ -23,6 +23,7 @@ export default function Header() {
   const { user, logOut } = useAuth();
   const { dark, toggleDark } = useTheme();
   const router = useRouter();
+  const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
 
   const handleLogout = async () => {
@@ -42,24 +43,30 @@ export default function Header() {
 
         {/* Desktop nav */}
         <nav className="hidden lg:flex items-center gap-1">
-          {navLinks.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              style={{ color: "var(--text-secondary)" }}
-              className="flex items-center gap-1.5 text-sm font-medium px-4 py-2 rounded-lg hover:bg-sky-100 transition"
-            >
-              {link.icon}
-              {link.label}
-            </Link>
-          ))}
+          {navLinks.map((link) => {
+            const isActive = pathname === link.href;
+            return (
+              <Link
+                key={link.href}
+                href={link.href}
+                style={{
+                  color: isActive ? "var(--accent)" : "var(--text-secondary)",
+                  backgroundColor: isActive ? "var(--accent-soft)" : "transparent",
+                }}
+                className="flex items-center gap-1.5 text-sm font-medium px-4 py-2 rounded-lg hover:bg-sky-100 transition"
+              >
+                {link.icon}
+                {link.label}
+              </Link>
+            );
+          })}
 
           {/* Dark mode toggle */}
           <button
             onClick={toggleDark}
             title="Toggle dark mode"
             style={{ color: "var(--text-secondary)" }}
-            className="w-9 h-9 flex items-center justify-center rounded-lg hover:bg-sky-100 transition text-lg ml-1"
+            className="w-9 h-9 flex items-center justify-center rounded-lg hover:bg-sky-100 transition ml-1"
           >
             {dark ? <FiSun size={18} /> : <FiMoon size={18} />}
           </button>
@@ -68,7 +75,11 @@ export default function Header() {
             <div className="flex items-center gap-2 ml-2">
               <Link
                 href="/profile"
-                style={{ color: "var(--text-secondary)", borderColor: "var(--border-color)" }}
+                style={{
+                  color: pathname === "/profile" ? "var(--accent)" : "var(--text-secondary)",
+                  borderColor: "var(--border-color)",
+                  backgroundColor: pathname === "/profile" ? "var(--accent-soft)" : "transparent",
+                }}
                 className="flex items-center gap-1.5 text-sm font-medium px-3 py-2 border rounded-lg hover:opacity-80 transition"
               >
                 <FiUser size={15} />
@@ -123,37 +134,48 @@ export default function Header() {
           }}
           className="lg:hidden border-t px-6 py-4 flex flex-col gap-2"
         >
-          {navLinks.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              onClick={() => setMobileOpen(false)}
-              style={{ color: "var(--text-secondary)" }}
-              className="flex items-center gap-2 text-sm font-medium py-2.5 px-3 rounded-lg hover:bg-sky-50 transition"
-            >
-              {link.icon}
-              {link.label}
-            </Link>
-          ))}
-          <Link
-            href="/profile"
-            onClick={() => setMobileOpen(false)}
-            style={{ color: "var(--text-secondary)" }}
-            className="flex items-center gap-2 text-sm font-medium py-2.5 px-3 rounded-lg hover:bg-sky-50 transition"
-          >
-            <FiUser size={15} />
-            Profile
-          </Link>
+          {navLinks.map((link) => {
+            const isActive = pathname === link.href;
+            return (
+              <Link
+                key={link.href}
+                href={link.href}
+                onClick={() => setMobileOpen(false)}
+                style={{
+                  color: isActive ? "var(--accent)" : "var(--text-secondary)",
+                  backgroundColor: isActive ? "var(--accent-soft)" : "transparent",
+                }}
+                className="flex items-center gap-2 text-sm font-medium py-2.5 px-3 rounded-lg hover:bg-sky-50 transition"
+              >
+                {link.icon}
+                {link.label}
+              </Link>
+            );
+          })}
           <div style={{ borderColor: "var(--border-color)" }} className="border-t my-1" />
           {user ? (
-            <button
-              onClick={handleLogout}
-              style={{ color: "var(--text-secondary)" }}
-              className="flex items-center gap-2 text-sm font-medium py-2.5 px-3 rounded-lg hover:bg-sky-50 transition text-left"
-            >
-              <FiLogOut size={15} />
-              Logout
-            </button>
+            <>
+              <Link
+                href="/profile"
+                onClick={() => setMobileOpen(false)}
+                style={{
+                  color: pathname === "/profile" ? "var(--accent)" : "var(--text-secondary)",
+                  backgroundColor: pathname === "/profile" ? "var(--accent-soft)" : "transparent",
+                }}
+                className="flex items-center gap-2 text-sm font-medium py-2.5 px-3 rounded-lg hover:bg-sky-50 transition"
+              >
+                <FiUser size={15} />
+                Profile
+              </Link>
+              <button
+                onClick={handleLogout}
+                style={{ color: "var(--text-secondary)" }}
+                className="flex items-center gap-2 text-sm font-medium py-2.5 px-3 rounded-lg hover:bg-sky-50 transition text-left"
+              >
+                <FiLogOut size={15} />
+                Logout
+              </button>
+            </>
           ) : (
             <Link
               href="/login"

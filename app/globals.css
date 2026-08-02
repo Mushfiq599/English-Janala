@@ -11,6 +11,11 @@
 
 /* ─── SCHOLAR THEME (18+) — default ─── */
 :root,
+
+html {
+  scroll-behavior: smooth;
+}
+
 html.theme-scholar {
   --bg-page: #f8fafc;
   --bg-card: #ffffff;

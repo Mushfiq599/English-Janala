@@ -5,6 +5,8 @@ import { AuthProvider } from "@/context/AuthContext";
 import { ThemeProvider } from "@/context/ThemeContext";
 import { ProfileProvider } from "@/context/ProfileContext";
 import ThemeWrapper from "@/components/shared/ThemeWrapper";
+import ScrollToTop from "@/components/shared/ScrollToTop";
+
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -79,6 +81,7 @@ export default function RootLayout({
           <AuthProvider>
             <ProfileProvider>
               <ThemeWrapper />
+              <ScrollToTop />
               {children}
             </ProfileProvider>
           </AuthProvider>
