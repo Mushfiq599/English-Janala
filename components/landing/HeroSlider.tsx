@@ -58,12 +58,29 @@ export default function HeroSlider() {
   const [current, setCurrent] = useState(0);
   const [direction, setDirection] = useState(1);
 
+  // Auto advance
   useEffect(() => {
     const timer = setInterval(() => {
       setDirection(1);
       setCurrent((prev) => (prev + 1) % slides.length);
     }, 4500);
     return () => clearInterval(timer);
+  }, []);
+
+  // Keyboard navigation
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === "ArrowRight") {
+        setDirection(1);
+        setCurrent((prev) => (prev + 1) % slides.length);
+      }
+      if (e.key === "ArrowLeft") {
+        setDirection(-1);
+        setCurrent((prev) => (prev - 1 + slides.length) % slides.length);
+      }
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
   }, []);
 
   const goTo = (index: number) => {
@@ -80,7 +97,9 @@ export default function HeroSlider() {
   };
 
   return (
-    <section className={`bg-gradient-to-br ${slide.bg} transition-all duration-700 min-h-[90vh] flex items-center`}>
+    <section
+      className={`bg-gradient-to-br ${slide.bg} transition-all duration-700 min-h-[90vh] flex items-center`}
+    >
       <div className="w-11/12 max-w-6xl mx-auto py-16">
         <AnimatePresence mode="wait" custom={direction}>
           <motion.div
@@ -99,7 +118,10 @@ export default function HeroSlider() {
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.1 }}
-                style={{ backgroundColor: slide.accent + "20", color: slide.accent }}
+                style={{
+                  backgroundColor: slide.accent + "20",
+                  color: slide.accent,
+                }}
                 className="inline-flex items-center gap-1.5 text-sm font-semibold px-4 py-1.5 rounded-full mb-6"
               >
                 {slide.badgeIcon}
@@ -110,7 +132,9 @@ export default function HeroSlider() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.15 }}
-                className={`text-4xl md:text-5xl font-bold leading-tight mb-4 ${slide.darkBg ? "text-white" : "text-gray-900"}`}
+                className={`text-4xl md:text-5xl font-bold leading-tight mb-4 ${
+                  slide.darkBg ? "text-white" : "text-gray-900"
+                }`}
               >
                 {slide.heading}{" "}
                 <span style={{ color: slide.accent }}>{slide.highlight}</span>
@@ -120,7 +144,9 @@ export default function HeroSlider() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2 }}
-                className={`text-lg mb-8 leading-relaxed max-w-lg ${slide.darkBg ? "text-slate-300" : "text-gray-600"}`}
+                className={`text-lg mb-8 leading-relaxed max-w-lg ${
+                  slide.darkBg ? "text-slate-300" : "text-gray-600"
+                }`}
               >
                 {slide.description}
               </motion.p>
@@ -186,6 +212,12 @@ export default function HeroSlider() {
             />
           ))}
         </div>
+        <p
+          style={{ color: slide.darkBg ? "#94a3b8" : "#9ca3af" }}
+          className="text-center text-xs mt-4"
+        >
+          Use arrow keys to navigate slides
+        </p>
       </div>
     </section>
   );
