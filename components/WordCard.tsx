@@ -12,9 +12,10 @@ import { FiVolume2, FiStar, FiInfo } from "react-icons/fi";
 interface Props {
   word: Word;
   levelId: string;
+  isNew?: boolean;
 }
 
-export default function WordCard({ word, levelId }: Props) {
+export default function WordCard({ word, levelId, isNew = false }: Props) {
   const { user } = useAuth();
   const [saved, setSaved] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -48,16 +49,34 @@ export default function WordCard({ word, levelId }: Props) {
           backgroundColor: "var(--bg-card)",
           borderColor: "var(--border-color)",
         }}
-        className="rounded-2xl shadow-sm border p-5 flex flex-col gap-3 hover:shadow-md transition"
+        className="rounded-2xl shadow-sm border p-5 flex flex-col gap-3 hover:shadow-md transition h-full"
       >
+        {/* New badge */}
+        {isNew && user && (
+          <div className="flex justify-end">
+            <span
+              style={{ backgroundColor: "#22c55e", color: "#fff" }}
+              className="text-xs font-bold px-2 py-0.5 rounded-full"
+            >
+              New
+            </span>
+          </div>
+        )}
+
         {/* Word + pronounce */}
         <div className="flex items-start justify-between">
           <div>
-            <h3 style={{ color: "var(--text-primary)" }} className="text-lg font-bold">
+            <h3
+              style={{ color: "var(--text-primary)" }}
+              className="text-lg font-bold"
+            >
               {word.word}
             </h3>
             {word.pronunciation && (
-              <p style={{ color: "var(--text-muted)" }} className="text-xs mt-0.5">
+              <p
+                style={{ color: "var(--text-muted)" }}
+                className="text-xs mt-0.5"
+              >
                 /{word.pronunciation}/
               </p>
             )}
@@ -66,14 +85,17 @@ export default function WordCard({ word, levelId }: Props) {
             onClick={() => pronounceWord(word.word)}
             title="Pronounce"
             style={{ color: "var(--accent)" }}
-            className="hover:opacity-70 transition p-1"
+            className="hover:opacity-70 transition p-1 flex-shrink-0"
           >
             <FiVolume2 size={20} />
           </button>
         </div>
 
         {/* Meaning */}
-        <p style={{ color: "var(--text-secondary)" }} className="text-sm leading-relaxed line-clamp-2">
+        <p
+          style={{ color: "var(--text-secondary)" }}
+          className="text-sm leading-relaxed line-clamp-2"
+        >
           {word.meaning}
         </p>
 
