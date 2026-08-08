@@ -8,23 +8,41 @@ import { markWordSeen } from "@/lib/progress";
 import { useAuth } from "@/context/AuthContext";
 import WordDetailModal from "@/components/WordDetailModal";
 import { FiVolume2, FiStar, FiInfo } from "react-icons/fi";
+import { db } from "@/lib/firebase";
+import { doc, getDoc } from "firebase/firestore";
 
 interface Props {
   word: Word;
   levelId: string;
   isNew?: boolean;
+  onToast?: (message: string, type: "success" | "error") => void;
 }
 
-export default function WordCard({ word, levelId, isNew = false }: Props) {
+export default function WordCard({
+  word,
+  levelId,
+  isNew = false,
+  onToast,
+}: Props) {
   const { user } = useAuth();
   const [saved, setSaved] = useState(false);
   const [saving, setSaving] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
 
+  // Mark as seen
   useEffect(() => {
     if (!user) return;
     markWordSeen(user.uid, levelId, word.id).catch(() => {});
   }, [user, levelId, word.id]);
+
+  // Check if already saved on mount
+  useEffect(() => {
+    if (!user) return;
+    const ref = doc(db, "users", user.uid, "savedWords", String(word.id));
+    getDoc(ref)
+      .then((snap) => setSaved(snap.exists()))
+      .catch(() => {});
+  }, [user, word.id]);
 
   const handleSave = async () => {
     if (!user) return;
@@ -33,10 +51,14 @@ export default function WordCard({ word, levelId, isNew = false }: Props) {
       if (saved) {
         await removeSavedWord(user.uid, word.id);
         setSaved(false);
+        onToast?.(`"${word.word}" removed from saved words`, "success");
       } else {
         await saveWord(user.uid, word);
         setSaved(true);
+        onToast?.(`"${word.word}" saved to your collection`, "success");
       }
+    } catch {
+      onToast?.("Something went wrong. Please try again.", "error");
     } finally {
       setSaving(false);
     }
