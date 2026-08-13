@@ -22,27 +22,23 @@ export default function WordSection({ levelId }: Props) {
   const [error, setError] = useState("");
   const { toasts, addToast, removeToast } = useToast();
 
+  // Fetch words — independent, never blocked by auth or Firestore
   useEffect(() => {
     setLoading(true);
     setError("");
+    getWordsByLevel(levelId)
+      .then(setWords)
+      .catch(() => setError("Failed to load words. Please try again."))
+      .finally(() => setLoading(false));
+  }, [levelId]);
 
-    const fetchData = async () => {
-      try {
-        const [fetchedWords, fetchedSeenIds] = await Promise.all([
-          getWordsByLevel(levelId),
-          user ? getSeenWordIds(user.uid, levelId) : Promise.resolve([]),
-        ]);
-        setWords(fetchedWords);
-        setSeenIds(fetchedSeenIds);
-      } catch {
-        setError("Failed to load words. Please try again.");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchData();
-  }, [levelId, user]);
+  // Fetch seen IDs separately — failure here never affects word display
+  useEffect(() => {
+    if (!user) return;
+    getSeenWordIds(user.uid, levelId)
+      .then(setSeenIds)
+      .catch(() => setSeenIds([]));
+  }, [user, levelId]);
 
   if (loading) {
     return (
@@ -60,8 +56,24 @@ export default function WordSection({ levelId }: Props) {
 
   if (error) {
     return (
-      <div className="flex flex-col items-center py-20 text-red-500 gap-3">
-        <p>{error}</p>
+      <div className="flex flex-col items-center py-20 gap-3">
+        <p style={{ color: "var(--text-muted)" }} className="text-sm">
+          {error}
+        </p>
+        <button
+          onClick={() => {
+            setLoading(true);
+            setError("");
+            getWordsByLevel(levelId)
+              .then(setWords)
+              .catch(() => setError("Failed to load words. Please try again."))
+              .finally(() => setLoading(false));
+          }}
+          style={{ backgroundColor: "var(--accent)" }}
+          className="text-sm text-white px-4 py-2 rounded-lg hover:opacity-90 transition"
+        >
+          Retry
+        </button>
       </div>
     );
   }
@@ -116,7 +128,7 @@ export default function WordSection({ levelId }: Props) {
               <WordCard
                 word={word}
                 levelId={levelId}
-                isNew={!seenIds.includes(word.id)}
+                isNew={user ? !seenIds.includes(word.id) : false}
                 onToast={addToast}
               />
             </motion.div>
@@ -124,7 +136,6 @@ export default function WordSection({ levelId }: Props) {
         </motion.div>
       </div>
 
-      {/* Toast notifications */}
       <Toast toasts={toasts} onRemove={removeToast} />
     </>
   );
