@@ -1,8 +1,9 @@
+import type { Metadata } from "next";
 import { getLessons } from "@/lib/api";
 import Header from "@/components/Header";
 import LessonGrid from "@/components/LessonGrid";
 import SiteFooter from "@/components/layout/Footer";
-import type { Metadata } from "next";
+import LessonSummaryBar from "@/components/lesson/LessonSummaryBar";
 
 export const metadata: Metadata = {
   title: "All Lessons",
@@ -17,10 +18,11 @@ export default async function LessonPage() {
     <main>
       <Header />
       <section className="w-11/12 max-w-6xl mx-auto py-10">
-        <div className="mb-8">
+        {/* Page header */}
+        <div className="mb-6">
           <h2
             style={{ color: "var(--text-primary)" }}
-            className="text-2xl font-bold mb-2"
+            className="text-2xl font-bold mb-1"
           >
             All Lessons
           </h2>
@@ -28,6 +30,11 @@ export default async function LessonPage() {
             Pick a lesson to start learning vocabulary
           </p>
         </div>
+
+        {/* Summary bar */}
+        <LessonSummaryBar />
+
+        {/* Lesson grid */}
         <LessonGrid lessons={lessons} />
       </section>
       <SiteFooter />
