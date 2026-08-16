@@ -4,7 +4,9 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import Image from "next/image";
-import { FiMap, FiCompass, FiBookOpen, FiArrowRight } from "react-icons/fi";
+import { FiMap, FiCompass, FiBookOpen, FiArrowRight, FiPlay } from "react-icons/fi";
+import { useAuth } from "@/context/AuthContext";
+import { useProfile } from "@/context/ProfileContext";
 
 const slides = [
   {
@@ -54,21 +56,73 @@ const slides = [
   },
 ];
 
+const tierConfig = {
+  kids: {
+    bg: "from-amber-50 to-yellow-100",
+    accent: "#f59e0b",
+    darkBg: false,
+    badge: "Welcome back, Explorer!",
+    badgeIcon: <FiMap size={14} />,
+    headingPrefix: "Ready for your next",
+    highlight: "Word Adventure?",
+    description:
+      "You are doing amazing! Pick up where you left off and collect more treasure words today.",
+    primaryCta: "Continue Learning",
+    primaryHref: "/lesson",
+    secondaryCta: "Take a Quiz",
+    secondaryHref: "/quiz",
+  },
+  teen: {
+    bg: "from-slate-900 to-cyan-950",
+    accent: "#06b6d4",
+    darkBg: true,
+    badge: "Welcome back!",
+    badgeIcon: <FiCompass size={14} />,
+    headingPrefix: "Keep building your",
+    highlight: "Vocabulary Edge",
+    description:
+      "Every word you learn gets you closer to your goals. Jump back in and keep the momentum going.",
+    primaryCta: "Continue Learning",
+    primaryHref: "/lesson",
+    secondaryCta: "Test Yourself",
+    secondaryHref: "/quiz",
+  },
+  scholar: {
+    bg: "from-sky-50 to-blue-100",
+    accent: "#0ea5e9",
+    darkBg: false,
+    badge: "Welcome back, Scholar!",
+    badgeIcon: <FiBookOpen size={14} />,
+    headingPrefix: "Continue your path to",
+    highlight: "English Mastery",
+    description:
+      "Your IELTS and TOEFL preparation is ongoing. Review your saved words or continue with the next lesson.",
+    primaryCta: "Continue Learning",
+    primaryHref: "/lesson",
+    secondaryCta: "Review Saved Words",
+    secondaryHref: "/saved",
+  },
+};
+
 export default function HeroSlider() {
+  const { user } = useAuth();
+  const { profile, themeTier, loading } = useProfile();
   const [current, setCurrent] = useState(0);
   const [direction, setDirection] = useState(1);
 
-  // Auto advance
+  // Auto advance — only for logged out slider
   useEffect(() => {
+    if (user) return;
     const timer = setInterval(() => {
       setDirection(1);
       setCurrent((prev) => (prev + 1) % slides.length);
     }, 4500);
     return () => clearInterval(timer);
-  }, []);
+  }, [user]);
 
   // Keyboard navigation
   useEffect(() => {
+    if (user) return;
     const handler = (e: KeyboardEvent) => {
       if (e.key === "ArrowRight") {
         setDirection(1);
@@ -81,13 +135,124 @@ export default function HeroSlider() {
     };
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
-  }, []);
+  }, [user]);
 
   const goTo = (index: number) => {
     setDirection(index > current ? 1 : -1);
     setCurrent(index);
   };
 
+  // Logged in — show personalized hero
+  if (user && !loading) {
+    const config = tierConfig[themeTier];
+    const firstName = profile?.name?.split(" ")[0] ?? "there";
+
+    return (
+      <section
+        className={`bg-gradient-to-br ${config.bg} transition-all duration-700 min-h-[70vh] flex items-center`}
+      >
+        <div className="w-11/12 max-w-6xl mx-auto py-16">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="flex flex-col-reverse md:flex-row items-center gap-12"
+          >
+            {/* Text */}
+            <div className="flex-1 text-center md:text-left">
+              {/* Badge */}
+              <motion.span
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.1 }}
+                style={{
+                  backgroundColor: config.accent + "20",
+                  color: config.accent,
+                }}
+                className="inline-flex items-center gap-1.5 text-sm font-semibold px-4 py-1.5 rounded-full mb-6"
+              >
+                {config.badgeIcon}
+                {config.badge}
+              </motion.span>
+
+              {/* Heading */}
+              <motion.h1
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.15 }}
+                className={`text-4xl md:text-5xl font-bold leading-tight mb-4 ${
+                  config.darkBg ? "text-white" : "text-gray-900"
+                }`}
+              >
+                Hey {firstName},{" "}
+                <span style={{ color: config.accent }}>
+                  {config.highlight}
+                </span>
+              </motion.h1>
+
+              <motion.p
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 }}
+                className={`text-lg mb-8 leading-relaxed max-w-lg ${
+                  config.darkBg ? "text-slate-300" : "text-gray-600"
+                }`}
+              >
+                {config.description}
+              </motion.p>
+
+              {/* CTAs */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.25 }}
+                className="flex flex-col sm:flex-row gap-3 justify-center md:justify-start"
+              >
+                <Link
+                  href={config.primaryHref}
+                  style={{ backgroundColor: config.accent }}
+                  className="inline-flex items-center justify-center gap-2 px-8 py-3.5 text-white font-bold rounded-xl hover:opacity-90 transition"
+                >
+                  <FiPlay size={15} />
+                  {config.primaryCta}
+                </Link>
+                <Link
+                  href={config.secondaryHref}
+                  className={`inline-flex items-center justify-center gap-2 px-8 py-3.5 font-bold rounded-xl border-2 transition ${
+                    config.darkBg
+                      ? "border-current text-cyan-400 hover:bg-cyan-400/10"
+                      : "border-gray-300 text-gray-600 hover:bg-gray-100"
+                  }`}
+                >
+                  {config.secondaryCta}
+                  <FiArrowRight size={15} />
+                </Link>
+              </motion.div>
+            </div>
+
+            {/* Image */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.1 }}
+              className="flex-1 flex justify-center"
+            >
+              <Image
+                src="/assets/hero-student.png"
+                alt="Keep learning"
+                width={420}
+                height={420}
+                priority
+                className="drop-shadow-2xl"
+              />
+            </motion.div>
+          </motion.div>
+        </div>
+      </section>
+    );
+  }
+
+  // Logged out — original slider
   const slide = slides[current];
 
   const variants = {
