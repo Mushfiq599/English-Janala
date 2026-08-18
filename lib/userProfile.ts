@@ -5,7 +5,7 @@ export interface UserProfile {
   uid: string;
   name: string;
   email: string;
-  dateOfBirth: string; // ISO string e.g. "2000-05-12"
+  dateOfBirth: string;
   age: number;
   theme: "kids" | "teen" | "scholar";
   createdAt: string;
@@ -66,4 +66,49 @@ export async function updateUserProfile(
 ): Promise<void> {
   const ref = doc(db, "users", uid, "profile", "data");
   await setDoc(ref, updates, { merge: true });
+}
+
+export async function updateStreak(uid: string): Promise<number> {
+  const ref = doc(db, "users", uid, "profile", "data");
+  const snap = await getDoc(ref);
+
+  if (!snap.exists()) return 0;
+
+  const data = snap.data() as UserProfile & {
+    currentStreak?: number;
+    lastActiveDate?: string;
+  };
+
+  const today = new Date().toISOString().split("T")[0];
+  const lastActive = data.lastActiveDate ?? "";
+  const currentStreak = data.currentStreak ?? 0;
+
+  // Already updated today — return current streak unchanged
+  if (lastActive === today) return currentStreak;
+
+  const yesterday = new Date();
+  yesterday.setDate(yesterday.getDate() - 1);
+  const yesterdayStr = yesterday.toISOString().split("T")[0];
+
+  // Visited yesterday → increment, otherwise reset to 1
+  let newStreak = 1;
+  if (lastActive === yesterdayStr) {
+    newStreak = currentStreak + 1;
+  }
+
+  await setDoc(
+    ref,
+    { currentStreak: newStreak, lastActiveDate: today },
+    { merge: true }
+  );
+
+  return newStreak;
+}
+
+export async function getStreak(uid: string): Promise<number> {
+  const ref = doc(db, "users", uid, "profile", "data");
+  const snap = await getDoc(ref);
+  if (!snap.exists()) return 0;
+  const data = snap.data() as { currentStreak?: number };
+  return data.currentStreak ?? 0;
 }
