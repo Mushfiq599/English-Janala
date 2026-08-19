@@ -4,11 +4,12 @@ import Header from "@/components/Header";
 import LessonGrid from "@/components/LessonGrid";
 import SiteFooter from "@/components/layout/Footer";
 import LessonSummaryBar from "@/components/lesson/LessonSummaryBar";
+import StreakTracker from "@/components/lesson/StreakTracker";
 
 export const metadata: Metadata = {
   title: "All Lessons",
   description:
-    "Browse all English vocabulary lessons from Basic to IELTS and TOEFL level. Learn words with meanings, pronunciation, and examples.",
+    "Browse all English vocabulary lessons from Basic to IELTS and TOEFL level.",
 };
 
 export default async function LessonPage() {
@@ -17,8 +18,8 @@ export default async function LessonPage() {
   return (
     <main>
       <Header />
+      <StreakTracker />
       <section className="w-11/12 max-w-6xl mx-auto py-10">
-        {/* Page header */}
         <div className="mb-6">
           <h2
             style={{ color: "var(--text-primary)" }}
@@ -30,11 +31,7 @@ export default async function LessonPage() {
             Pick a lesson to start learning vocabulary
           </p>
         </div>
-
-        {/* Summary bar */}
         <LessonSummaryBar />
-
-        {/* Lesson grid */}
         <LessonGrid lessons={lessons} />
       </section>
       <SiteFooter />
