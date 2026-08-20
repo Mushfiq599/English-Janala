@@ -4,10 +4,22 @@ import Image from "next/image";
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
 import { useTheme } from "@/context/ThemeContext";
+import { useProfile } from "@/context/ProfileContext";
 import { useRouter, usePathname } from "next/navigation";
 import {
-  FiSun, FiMoon, FiMenu, FiX, FiLogOut, FiLogIn,
-  FiBookOpen, FiStar, FiHelpCircle, FiTarget, FiAward, FiUser
+  FiSun,
+  FiMoon,
+  FiMenu,
+  FiX,
+  FiLogOut,
+  FiLogIn,
+  FiBookOpen,
+  FiStar,
+  FiHelpCircle,
+  FiTarget,
+  FiAward,
+  FiUser,
+  FiZap,
 } from "react-icons/fi";
 import { useState } from "react";
 
@@ -22,6 +34,7 @@ const navLinks = [
 export default function Header() {
   const { user, logOut } = useAuth();
   const { dark, toggleDark } = useTheme();
+  const { streak } = useProfile();
   const router = useRouter();
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -32,13 +45,31 @@ export default function Header() {
   };
 
   return (
-    <header style={{ backgroundColor: "var(--bg-header)" }} className="shadow-sm sticky top-0 z-50">
+    <header
+      style={{ backgroundColor: "var(--bg-header)" }}
+      className="shadow-sm sticky top-0 z-50"
+    >
       <div className="flex items-center justify-between w-11/12 mx-auto py-3">
         {/* Logo */}
         <Link href="/" className="flex items-center gap-1">
-          <span style={{ color: "var(--text-primary)" }} className="text-lg font-bold">English</span>
-          <Image src="/assets/logo.png" alt="English Janala logo" width={28} height={28} />
-          <span style={{ color: "var(--text-primary)" }} className="font-bangla text-lg font-semibold">জানালা</span>
+          <span
+            style={{ color: "var(--text-primary)" }}
+            className="text-lg font-bold"
+          >
+            English
+          </span>
+          <Image
+            src="/assets/logo.png"
+            alt="English Janala logo"
+            width={28}
+            height={28}
+          />
+          <span
+            style={{ color: "var(--text-primary)" }}
+            className="font-bangla text-lg font-semibold"
+          >
+            জানালা
+          </span>
         </Link>
 
         {/* Desktop nav */}
@@ -51,7 +82,9 @@ export default function Header() {
                 href={link.href}
                 style={{
                   color: isActive ? "var(--accent)" : "var(--text-secondary)",
-                  backgroundColor: isActive ? "var(--accent-soft)" : "transparent",
+                  backgroundColor: isActive
+                    ? "var(--accent-soft)"
+                    : "transparent",
                 }}
                 className="flex items-center gap-1.5 text-sm font-medium px-4 py-2 rounded-lg hover:bg-sky-100 transition"
               >
@@ -73,18 +106,42 @@ export default function Header() {
 
           {user ? (
             <div className="flex items-center gap-2 ml-2">
+              {/* Streak badge */}
+              {streak > 0 && (
+                <div
+                  style={{
+                    backgroundColor: "#fef9c3",
+                    color: "#f59e0b",
+                    borderColor: "#fde68a",
+                  }}
+                  className="flex items-center gap-1 text-xs font-bold px-2.5 py-1.5 rounded-lg border"
+                >
+                  <FiZap size={13} fill="#f59e0b" />
+                  {streak} day{streak !== 1 ? "s" : ""}
+                </div>
+              )}
+
+              {/* Profile link */}
               <Link
                 href="/profile"
                 style={{
-                  color: pathname === "/profile" ? "var(--accent)" : "var(--text-secondary)",
+                  color:
+                    pathname === "/profile"
+                      ? "var(--accent)"
+                      : "var(--text-secondary)",
                   borderColor: "var(--border-color)",
-                  backgroundColor: pathname === "/profile" ? "var(--accent-soft)" : "transparent",
+                  backgroundColor:
+                    pathname === "/profile"
+                      ? "var(--accent-soft)"
+                      : "transparent",
                 }}
                 className="flex items-center gap-1.5 text-sm font-medium px-3 py-2 border rounded-lg hover:opacity-80 transition"
               >
                 <FiUser size={15} />
                 Profile
               </Link>
+
+              {/* Logout */}
               <button
                 onClick={handleLogout}
                 style={{ backgroundColor: "var(--accent)" }}
@@ -108,6 +165,22 @@ export default function Header() {
 
         {/* Mobile right side */}
         <div className="lg:hidden flex items-center gap-2">
+          {/* Streak badge mobile */}
+          {user && streak > 0 && (
+            <div
+              style={{
+                backgroundColor: "#fef9c3",
+                color: "#f59e0b",
+                borderColor: "#fde68a",
+              }}
+              className="flex items-center gap-1 text-xs font-bold px-2 py-1 rounded-lg border"
+            >
+              <FiZap size={12} fill="#f59e0b" />
+              {streak}
+            </div>
+          )}
+
+          {/* Dark mode toggle */}
           <button
             onClick={toggleDark}
             style={{ color: "var(--text-secondary)" }}
@@ -115,6 +188,8 @@ export default function Header() {
           >
             {dark ? <FiSun size={18} /> : <FiMoon size={18} />}
           </button>
+
+          {/* Hamburger */}
           <button
             onClick={() => setMobileOpen(!mobileOpen)}
             style={{ color: "var(--text-secondary)" }}
@@ -143,7 +218,9 @@ export default function Header() {
                 onClick={() => setMobileOpen(false)}
                 style={{
                   color: isActive ? "var(--accent)" : "var(--text-secondary)",
-                  backgroundColor: isActive ? "var(--accent-soft)" : "transparent",
+                  backgroundColor: isActive
+                    ? "var(--accent-soft)"
+                    : "transparent",
                 }}
                 className="flex items-center gap-2 text-sm font-medium py-2.5 px-3 rounded-lg hover:bg-sky-50 transition"
               >
@@ -152,15 +229,26 @@ export default function Header() {
               </Link>
             );
           })}
-          <div style={{ borderColor: "var(--border-color)" }} className="border-t my-1" />
+
+          <div
+            style={{ borderColor: "var(--border-color)" }}
+            className="border-t my-1"
+          />
+
           {user ? (
             <>
               <Link
                 href="/profile"
                 onClick={() => setMobileOpen(false)}
                 style={{
-                  color: pathname === "/profile" ? "var(--accent)" : "var(--text-secondary)",
-                  backgroundColor: pathname === "/profile" ? "var(--accent-soft)" : "transparent",
+                  color:
+                    pathname === "/profile"
+                      ? "var(--accent)"
+                      : "var(--text-secondary)",
+                  backgroundColor:
+                    pathname === "/profile"
+                      ? "var(--accent-soft)"
+                      : "transparent",
                 }}
                 className="flex items-center gap-2 text-sm font-medium py-2.5 px-3 rounded-lg hover:bg-sky-50 transition"
               >
