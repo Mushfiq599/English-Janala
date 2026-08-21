@@ -6,10 +6,7 @@ import { useAuth } from "@/context/AuthContext";
 import { useProfile } from "@/context/ProfileContext";
 import { getUserStats, UserStats } from "@/lib/userStats";
 import { updateLeaderboardEntry } from "@/lib/leaderboard";
-import {
-    createUserProfile,
-    calculateAge,
-} from "@/lib/userProfile";
+import { createUserProfile, calculateAge } from "@/lib/userProfile";
 import Header from "@/components/Header";
 import SiteFooter from "@/components/layout/Footer";
 import { motion } from "framer-motion";
@@ -22,6 +19,7 @@ import {
     FiMail,
     FiCalendar,
     FiAlertCircle,
+    FiZap,
 } from "react-icons/fi";
 
 const tierLabels: Record<string, { label: string; color: string; bg: string }> =
@@ -33,7 +31,13 @@ const tierLabels: Record<string, { label: string; color: string; bg: string }> =
 
 export default function ProfilePage() {
     const { user, loading: authLoading } = useAuth();
-    const { profile, themeTier, loading: profileLoading, refreshProfile } = useProfile();
+    const {
+        profile,
+        themeTier,
+        loading: profileLoading,
+        refreshProfile,
+        streak,
+    } = useProfile();
     const router = useRouter();
 
     const [stats, setStats] = useState<UserStats | null>(null);
@@ -114,12 +118,7 @@ export default function ProfilePage() {
         if (!user) return;
         setSetupLoading(true);
         try {
-            await createUserProfile(
-                user.uid,
-                setupName,
-                user.email ?? "",
-                setupDOB
-            );
+            await createUserProfile(user.uid, setupName, user.email ?? "", setupDOB);
             await refreshProfile();
         } catch {
             setSetupError("Could not save profile. Please try again.");
@@ -288,6 +287,7 @@ export default function ProfilePage() {
         <main>
             <Header />
             <section className="w-11/12 max-w-4xl mx-auto py-10">
+
                 {/* Profile card */}
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
@@ -297,9 +297,10 @@ export default function ProfilePage() {
                         backgroundColor: "var(--bg-card)",
                         borderColor: "var(--border-color)",
                     }}
-                    className="border rounded-2xl p-8 mb-8 shadow-sm"
+                    className="border rounded-2xl p-8 mb-6 shadow-sm"
                 >
                     <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6">
+                        {/* Avatar */}
                         <div
                             style={{ backgroundColor: "var(--accent)", color: "#fff" }}
                             className="w-20 h-20 rounded-full flex items-center justify-center text-3xl font-bold flex-shrink-0"
@@ -307,6 +308,7 @@ export default function ProfilePage() {
                             {profile.name?.charAt(0).toUpperCase() ?? "U"}
                         </div>
 
+                        {/* Info */}
                         <div className="flex-1 text-center sm:text-left">
                             <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-2">
                                 <h1
@@ -356,7 +358,43 @@ export default function ProfilePage() {
                     </div>
                 </motion.div>
 
-                {/* Stats */}
+                {/* Streak card */}
+                {streak > 0 && (
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.4, delay: 0.1 }}
+                        style={{
+                            backgroundColor: "#fef9c3",
+                            borderColor: "#fde68a",
+                        }}
+                        className="border rounded-2xl p-5 mb-8 flex items-center gap-4"
+                    >
+                        <div
+                            style={{ backgroundColor: "#f59e0b", color: "#fff" }}
+                            className="w-14 h-14 rounded-2xl flex items-center justify-center flex-shrink-0"
+                        >
+                            <FiZap size={28} />
+                        </div>
+                        <div>
+                            <p
+                                className="text-2xl font-bold"
+                                style={{ color: "#92400e" }}
+                            >
+                                {streak} day{streak !== 1 ? "s" : ""} streak
+                            </p>
+                            <p className="text-sm" style={{ color: "#a16207" }}>
+                                {streak === 1
+                                    ? "You started a streak today! Come back tomorrow to keep it going."
+                                    : streak >= 7
+                                        ? "Incredible consistency! Keep it up."
+                                        : "Great work! Visit a lesson every day to keep your streak alive."}
+                            </p>
+                        </div>
+                    </motion.div>
+                )}
+
+                {/* Stats section */}
                 <h2
                     style={{ color: "var(--text-primary)" }}
                     className="text-lg font-bold mb-4"
@@ -447,7 +485,7 @@ export default function ProfilePage() {
                     </div>
                 )}
 
-                {/* Progress bar */}
+                {/* Lesson progress bar */}
                 {!statsLoading && !statsError && stats && (
                     <>
                         <h2
