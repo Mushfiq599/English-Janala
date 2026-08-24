@@ -1,3 +1,4 @@
+
 @import "tailwindcss";
 
 @theme inline {
@@ -11,11 +12,6 @@
 
 /* ─── SCHOLAR THEME (18+) — default ─── */
 :root,
-
-html {
-  scroll-behavior: smooth;
-}
-
 html.theme-scholar {
   --bg-page: #f8fafc;
   --bg-card: #ffffff;
@@ -99,8 +95,43 @@ html.theme-kids.dark {
 }
 
 /* ─── Global base styles ─── */
+html {
+  scroll-behavior: smooth;
+}
+
 body {
   background-color: var(--bg-page);
   color: var(--text-primary);
   transition: background-color 0.4s ease, color 0.4s ease;
+}
+
+/* ─── Print styles ─── */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+
+  #print-saved-words,
+  #print-saved-words * {
+    visibility: visible;
+  }
+
+  #print-saved-words {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    padding: 2rem;
+    background: white;
+    color: black;
+  }
+
+  .print-word-card {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  .no-print {
+    display: none !important;
+  }
 }
