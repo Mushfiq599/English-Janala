@@ -3,15 +3,21 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
+import { useProfile } from "@/context/ProfileContext";
 import { getSavedWords, removeSavedWord } from "@/lib/savedWords";
 import { Word } from "@/types/word";
 import Header from "@/components/Header";
+import SiteFooter from "@/components/layout/Footer";
 import { pronounceWord } from "@/lib/speech";
 import WordDetailModal from "@/components/WordDetailModal";
+import PrintButton from "@/components/shared/PrintButton";
+import PrintLayout from "@/components/saved/PrintLayout";
 import { FiVolume2, FiTrash2, FiInfo, FiBookOpen } from "react-icons/fi";
+import { motion } from "framer-motion";
 
 export default function SavedPage() {
   const { user, loading } = useAuth();
+  const { profile } = useProfile();
   const router = useRouter();
   const [words, setWords] = useState<Word[]>([]);
   const [fetching, setFetching] = useState(true);
@@ -39,7 +45,13 @@ export default function SavedPage() {
       <main>
         <Header />
         <div className="flex justify-center items-center py-32">
-          <div className="w-10 h-10 border-4 border-t-transparent rounded-full animate-spin" style={{ borderColor: "var(--accent)", borderTopColor: "transparent" }} />
+          <div
+            className="w-10 h-10 border-4 border-t-transparent rounded-full animate-spin"
+            style={{
+              borderColor: "var(--accent)",
+              borderTopColor: "transparent",
+            }}
+          />
         </div>
       </main>
     );
@@ -48,26 +60,53 @@ export default function SavedPage() {
   return (
     <main>
       <Header />
-      <section className="w-11/12 mx-auto py-10">
+
+      {/* Hidden print layout — only visible when printing */}
+      <PrintLayout words={words} userName={profile?.name} />
+
+      <section className="w-11/12 mx-auto py-10 no-print">
+        {/* Page header */}
         <div className="flex items-center justify-between mb-2">
-          <h2 style={{ color: "var(--text-primary)" }} className="text-2xl font-bold">
+          <h2
+            style={{ color: "var(--text-primary)" }}
+            className="text-2xl font-bold"
+          >
             Saved Words
           </h2>
-          <span style={{ color: "var(--text-muted)" }} className="text-sm">
-            {words.length} words saved
-          </span>
+          <div className="flex items-center gap-3">
+            <span
+              style={{ color: "var(--text-muted)" }}
+              className="text-sm"
+            >
+              {words.length} words saved
+            </span>
+            <PrintButton disabled={words.length === 0} />
+          </div>
         </div>
-        <p style={{ color: "var(--text-secondary)" }} className="text-sm mb-8">
+        <p
+          style={{ color: "var(--text-secondary)" }}
+          className="text-sm mb-8"
+        >
           Your personal vocabulary list — words you saved across all lessons
         </p>
 
         {words.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-32 text-center">
-            <FiBookOpen size={48} style={{ color: "var(--text-muted)" }} className="mb-4" />
-            <p style={{ color: "var(--text-primary)" }} className="text-lg font-medium">
+            <FiBookOpen
+              size={48}
+              style={{ color: "var(--text-muted)" }}
+              className="mb-4"
+            />
+            <p
+              style={{ color: "var(--text-primary)" }}
+              className="text-lg font-medium"
+            >
               No saved words yet
             </p>
-            <p style={{ color: "var(--text-muted)" }} className="text-sm mt-1 mb-6">
+            <p
+              style={{ color: "var(--text-muted)" }}
+              className="text-sm mt-1 mb-6"
+            >
               Go to a lesson and tap the star on any word to save it here
             </p>
             <button
@@ -80,22 +119,32 @@ export default function SavedPage() {
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-            {words.map((word) => (
-              <div
+            {words.map((word, i) => (
+              <motion.div
                 key={word.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3, delay: i * 0.05 }}
                 style={{
                   backgroundColor: "var(--bg-card)",
                   borderColor: "var(--border-color)",
                 }}
                 className="rounded-2xl shadow-sm border p-5 flex flex-col gap-3 hover:shadow-md transition"
               >
+                {/* Word + pronounce */}
                 <div className="flex items-start justify-between">
                   <div>
-                    <h3 style={{ color: "var(--text-primary)" }} className="text-lg font-bold">
+                    <h3
+                      style={{ color: "var(--text-primary)" }}
+                      className="text-lg font-bold"
+                    >
                       {word.word}
                     </h3>
                     {word.pronunciation && (
-                      <p style={{ color: "var(--text-muted)" }} className="text-xs mt-0.5">
+                      <p
+                        style={{ color: "var(--text-muted)" }}
+                        className="text-xs mt-0.5"
+                      >
                         /{word.pronunciation}/
                       </p>
                     )}
@@ -110,26 +159,38 @@ export default function SavedPage() {
                   </button>
                 </div>
 
-                <p style={{ color: "var(--text-secondary)" }} className="text-sm leading-relaxed line-clamp-2">
+                {/* Meaning */}
+                <p
+                  style={{ color: "var(--text-secondary)" }}
+                  className="text-sm leading-relaxed line-clamp-2"
+                >
                   {word.meaning}
                 </p>
 
+                {/* Parts of speech badge */}
                 {word.partsOfSpeech && (
                   <span
-                    style={{ backgroundColor: "var(--accent-soft)", color: "var(--accent)" }}
+                    style={{
+                      backgroundColor: "var(--accent-soft)",
+                      color: "var(--accent)",
+                    }}
                     className="self-start text-xs px-2 py-0.5 rounded-full font-medium"
                   >
                     {word.partsOfSpeech}
                   </span>
                 )}
 
+                {/* Actions */}
                 <div
                   style={{ borderColor: "var(--border-color)" }}
                   className="flex items-center gap-2 mt-auto pt-2 border-t"
                 >
                   <button
                     onClick={() => setSelectedWord(word)}
-                    style={{ backgroundColor: "var(--accent-soft)", color: "var(--accent)" }}
+                    style={{
+                      backgroundColor: "var(--accent-soft)",
+                      color: "var(--accent)",
+                    }}
                     className="flex-1 flex items-center justify-center gap-1.5 text-sm font-medium py-1.5 rounded-lg hover:opacity-80 transition"
                   >
                     <FiInfo size={14} />
@@ -143,15 +204,22 @@ export default function SavedPage() {
                     <FiTrash2 size={16} />
                   </button>
                 </div>
-              </div>
+              </motion.div>
             ))}
           </div>
         )}
       </section>
 
       {selectedWord && (
-        <WordDetailModal word={selectedWord} onClose={() => setSelectedWord(null)} />
+        <WordDetailModal
+          word={selectedWord}
+          onClose={() => setSelectedWord(null)}
+        />
       )}
+
+      <div className="no-print">
+        <SiteFooter />
+      </div>
     </main>
   );
 }
