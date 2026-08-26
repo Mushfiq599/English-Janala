@@ -10,7 +10,7 @@ import SiteFooter from "@/components/layout/Footer";
 import QuizLessonPicker from "@/components/quiz/QuizLessonPicker";
 import QuizCard from "@/components/quiz/QuizCard";
 import QuizResults from "@/components/quiz/QuizResults";
-
+import { saveQuizScore } from "@/lib/quizScores";
 
 type Phase = "pick" | "quiz" | "results";
 
@@ -84,14 +84,29 @@ export default function QuizPage() {
     };
 
     const handleAnswer = useCallback(
-        (answer: string) => {
-            setSelectedAnswer(answer);
-            if (answer === questions[currentIndex].correctAnswer) {
-                setScore((s) => s + 1);
-            }
+        async (answer: string) => {
+            const isCorrect = answer === questions[currentIndex].correctAnswer;
+            const newScore = isCorrect ? score + 1 : score;
 
-            setTimeout(() => {
-                if (currentIndex + 1 >= questions.length) {
+            setSelectedAnswer(answer);
+            if (isCorrect) setScore(newScore);
+
+            setTimeout(async () => {
+                const isLast = currentIndex + 1 >= questions.length;
+
+                if (isLast) {
+                    // Save score to Firestore before showing results
+                    if (user) {
+                        await saveQuizScore(user.uid, {
+                            lessonName: activeLessonName,
+                            score: newScore,
+                            total: questions.length,
+                            percentage: Math.round(
+                                (newScore / questions.length) * 100
+                            ),
+                            completedAt: new Date().toISOString(),
+                        }).catch(() => { });
+                    }
                     setPhase("results");
                 } else {
                     setCurrentIndex((i) => i + 1);
@@ -99,7 +114,7 @@ export default function QuizPage() {
                 }
             }, 1200);
         },
-        [currentIndex, questions]
+        [currentIndex, questions, score, user, activeLessonName]
     );
 
     const handleRetry = () => {
@@ -122,7 +137,10 @@ export default function QuizPage() {
                 <div className="flex justify-center items-center py-32">
                     <div
                         className="w-10 h-10 border-4 border-t-transparent rounded-full animate-spin"
-                        style={{ borderColor: "var(--accent)", borderTopColor: "transparent" }}
+                        style={{
+                            borderColor: "var(--accent)",
+                            borderTopColor: "transparent",
+                        }}
                     />
                 </div>
             </main>
@@ -133,7 +151,7 @@ export default function QuizPage() {
         <main>
             <Header />
             <section className="w-11/12 max-w-4xl mx-auto py-10 min-h-screen">
-                {/* Header bar */}
+                {/* Header bar — pick phase */}
                 {phase === "pick" && (
                     <div className="mb-10">
                         <h1
@@ -148,6 +166,7 @@ export default function QuizPage() {
                     </div>
                 )}
 
+                {/* Header bar — quiz phase */}
                 {phase === "quiz" && (
                     <div className="flex items-center justify-between mb-8">
                         <div>
@@ -179,7 +198,10 @@ export default function QuizPage() {
                     <div className="flex justify-center items-center py-32">
                         <div
                             className="w-10 h-10 border-4 border-t-transparent rounded-full animate-spin"
-                            style={{ borderColor: "var(--accent)", borderTopColor: "transparent" }}
+                            style={{
+                                borderColor: "var(--accent)",
+                                borderTopColor: "transparent",
+                            }}
                         />
                     </div>
                 ) : phase === "pick" ? (
