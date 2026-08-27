@@ -7,6 +7,7 @@ import { useProfile } from "@/context/ProfileContext";
 import { getUserStats, UserStats } from "@/lib/userStats";
 import { updateLeaderboardEntry } from "@/lib/leaderboard";
 import { createUserProfile, calculateAge } from "@/lib/userProfile";
+import QuizHistory from "@/components/profile/QuizHistory";
 import Header from "@/components/Header";
 import SiteFooter from "@/components/layout/Footer";
 import { motion } from "framer-motion";
@@ -545,6 +546,14 @@ export default function ProfilePage() {
                         </motion.div>
                     </>
                 )}
+                {/* Quiz history */}
+                <h2
+                    style={{ color: "var(--text-primary)" }}
+                    className="text-lg font-bold mb-4 mt-10"
+                >
+                    Recent Quiz Results
+                </h2>
+                <QuizHistory />
             </section>
             <SiteFooter />
         </main>
