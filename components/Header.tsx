@@ -7,25 +7,16 @@ import { useTheme } from "@/context/ThemeContext";
 import { useProfile } from "@/context/ProfileContext";
 import { useRouter, usePathname } from "next/navigation";
 import {
-  FiSun,
-  FiMoon,
-  FiMenu,
-  FiX,
-  FiLogOut,
-  FiLogIn,
-  FiBookOpen,
-  FiStar,
-  FiHelpCircle,
-  FiTarget,
-  FiAward,
-  FiUser,
-  FiZap,
+  FiSun, FiMoon, FiMenu, FiX, FiLogOut, FiLogIn,
+  FiBookOpen, FiStar, FiHelpCircle, FiTarget,
+  FiAward, FiUser, FiZap, FiLayers,
 } from "react-icons/fi";
 import { useState } from "react";
 
 const navLinks = [
   { label: "FAQ", href: "/faq", icon: <FiHelpCircle /> },
   { label: "Learn", href: "/lesson", icon: <FiBookOpen /> },
+  { label: "Flashcards", href: "/flashcards", icon: <FiLayers /> },
   { label: "Quiz", href: "/quiz", icon: <FiTarget /> },
   { label: "Saved", href: "/saved", icon: <FiStar /> },
   { label: "Leaderboard", href: "/leaderboard", icon: <FiAward /> },

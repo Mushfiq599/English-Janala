@@ -16,3 +16,7 @@ export interface Word {
   when_to_say?: string;
   image_url?: string;
 }
+export interface Flashcard {
+  word: Word;
+  status: "unseen" | "got_it" | "review_again";
+}
