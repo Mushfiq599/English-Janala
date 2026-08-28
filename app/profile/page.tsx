@@ -22,6 +22,7 @@ import {
     FiAlertCircle,
     FiZap,
 } from "react-icons/fi";
+import BadgeGrid from "@/components/profile/BadgeGrid";
 
 const tierLabels: Record<string, { label: string; color: string; bg: string }> =
 {
@@ -554,6 +555,25 @@ export default function ProfilePage() {
                     Recent Quiz Results
                 </h2>
                 <QuizHistory />
+                {/* Badges */}
+                <h2
+                    style={{ color: "var(--text-primary)" }}
+                    className="text-lg font-bold mb-4 mt-10"
+                >
+                    Achievements
+                </h2>
+                <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.4, delay: 0.4 }}
+                    style={{
+                        backgroundColor: "var(--bg-card)",
+                        borderColor: "var(--border-color)",
+                    }}
+                    className="border rounded-2xl p-6 shadow-sm"
+                >
+                    <BadgeGrid />
+                </motion.div>
             </section>
             <SiteFooter />
         </main>
