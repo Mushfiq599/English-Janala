@@ -5,8 +5,11 @@ import { FaGithub, FaFacebook, FaInstagram } from "react-icons/fa";
 const links = {
   Learn: [
     { label: "All Lessons", href: "/lesson" },
-    { label: "Saved Words", href: "/saved" },
+    { label: "Flashcards", href: "/flashcards" },
     { label: "Quiz Mode", href: "/quiz" },
+    { label: "Typing Challenge", href: "/typing" },
+    { label: "Exam Preparation", href: "/exam-prep" },
+    { label: "Saved Words", href: "/saved" },
     { label: "Leaderboard", href: "/leaderboard" },
   ],
   Support: [
