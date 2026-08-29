@@ -1,6 +1,5 @@
 import { ImageResponse } from "next/og";
 
-export const runtime = "edge";
 export const alt = "English Janala";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
@@ -20,7 +19,6 @@ export default async function Image() {
                     fontFamily: "sans-serif",
                 }}
             >
-                {/* Top accent bar */}
                 <div
                     style={{
                         position: "absolute",
@@ -32,7 +30,6 @@ export default async function Image() {
                     }}
                 />
 
-                {/* Logo area */}
                 <div
                     style={{
                         display: "flex",
@@ -74,7 +71,6 @@ export default async function Image() {
                     </div>
                 </div>
 
-                {/* Tagline */}
                 <div
                     style={{
                         fontSize: 28,
@@ -87,7 +83,6 @@ export default async function Image() {
                     Interactive vocabulary learning for ages 5–30
                 </div>
 
-                {/* Badges */}
                 <div
                     style={{
                         display: "flex",
@@ -113,7 +108,6 @@ export default async function Image() {
                     ))}
                 </div>
 
-                {/* Bottom accent */}
                 <div
                     style={{
                         position: "absolute",
