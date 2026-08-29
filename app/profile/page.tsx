@@ -11,6 +11,8 @@ import QuizHistory from "@/components/profile/QuizHistory";
 import Header from "@/components/Header";
 import SiteFooter from "@/components/layout/Footer";
 import { motion } from "framer-motion";
+import Link from "next/link";
+import { FiSettings } from "react-icons/fi";
 import {
     FiBookOpen,
     FiStar,
@@ -326,6 +328,17 @@ export default function ProfilePage() {
                                     {tier.label}
                                 </span>
                             </div>
+                            <Link
+                                href="/settings"
+                                style={{
+                                    borderColor: "var(--border-color)",
+                                    color: "var(--text-secondary)",
+                                }}
+                                className="self-center flex items-center gap-1.5 text-xs border px-3 py-1.5 rounded-lg hover:opacity-80 transition"
+                            >
+                                <FiSettings size={13} />
+                                Edit Profile
+                            </Link>
 
                             <div className="flex flex-col sm:flex-row gap-4 mt-3">
                                 <div

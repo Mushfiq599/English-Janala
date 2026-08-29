@@ -6,6 +6,7 @@ import { useAuth } from "@/context/AuthContext";
 import { useTheme } from "@/context/ThemeContext";
 import { useProfile } from "@/context/ProfileContext";
 import { useRouter, usePathname } from "next/navigation";
+import { FiSettings } from "react-icons/fi";
 import {
   FiSun, FiMoon, FiMenu, FiX, FiLogOut, FiLogIn,
   FiBookOpen, FiStar, FiHelpCircle, FiTarget,
@@ -245,6 +246,24 @@ export default function Header() {
               >
                 <FiUser size={15} />
                 Profile
+              </Link>
+              <Link
+                href="/settings"
+                onClick={() => setMobileOpen(false)}
+                style={{
+                  color:
+                    pathname === "/settings"
+                      ? "var(--accent)"
+                      : "var(--text-secondary)",
+                  backgroundColor:
+                    pathname === "/settings"
+                      ? "var(--accent-soft)"
+                      : "transparent",
+                }}
+                className="flex items-center gap-2 text-sm font-medium py-2.5 px-3 rounded-lg hover:bg-sky-50 transition"
+              >
+                <FiSettings size={15} />
+                Settings
               </Link>
               <button
                 onClick={handleLogout}
