@@ -6,7 +6,8 @@ import { ThemeProvider } from "@/context/ThemeContext";
 import { ProfileProvider } from "@/context/ProfileContext";
 import ThemeWrapper from "@/components/shared/ThemeWrapper";
 import ScrollToTop from "@/components/shared/ScrollToTop";
-
+import OfflineBanner from "@/components/shared/OfflineBanner";
+import InstallPrompt from "@/components/shared/InstallPrompt";
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -26,7 +27,7 @@ export const metadata: Metadata = {
     template: "%s | English Janala",
   },
   description:
-    "English Janala is an interactive English vocabulary learning platform for all ages — from curious kids to IELTS and TOEFL candidates. Learn words lesson by lesson with pronunciation, quizzes, and progress tracking.",
+    "English Janala is an interactive English vocabulary learning platform for all ages — from curious kids to IELTS and TOEFL candidates.",
   keywords: [
     "English vocabulary",
     "learn English",
@@ -39,6 +40,12 @@ export const metadata: Metadata = {
   authors: [{ name: "Mushfiqur Rahman", url: "https://github.com/Mushfiq599" }],
   creator: "Mushfiqur Rahman",
   metadataBase: new URL("https://english-janala.vercel.app"),
+  manifest: "/manifest.json",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "English Janala",
+  },
   openGraph: {
     type: "website",
     locale: "en_US",
@@ -65,7 +72,7 @@ export const metadata: Metadata = {
   },
   icons: {
     icon: "/assets/logo.png",
-    apple: "/assets/logo.png",
+    apple: "/icons/icon-192x192.png",
   },
 };
 
@@ -77,6 +84,8 @@ export default function RootLayout({
       <body
         className={`${poppins.variable} ${hindSiliguri.variable} font-sans antialiased`}
       >
+        <OfflineBanner />
+        <InstallPrompt />
         <ThemeProvider>
           <AuthProvider>
             <ProfileProvider>

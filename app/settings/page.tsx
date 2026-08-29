@@ -24,10 +24,9 @@ import {
     FiCheck,
 } from "react-icons/fi";
 
-const tierLabels: Record
-string,
-    { label: string; color: string; bg: string }
-    > = {
+type TierLabel = { label: string; color: string; bg: string };
+
+const tierLabels: Record<string, TierLabel> = {
     kids: { label: "Young Explorer (Age 5–12)", color: "#f59e0b", bg: "#fef9c3" },
     teen: { label: "Teen Explorer (Age 13–17)", color: "#06b6d4", bg: "#cffafe" },
     scholar: { label: "Scholar (Age 18+)", color: "#0ea5e9", bg: "#f0f9ff" },
