@@ -10,7 +10,7 @@ import { FiSettings } from "react-icons/fi";
 import {
   FiSun, FiMoon, FiMenu, FiX, FiLogOut, FiLogIn,
   FiBookOpen, FiStar, FiHelpCircle, FiTarget,
-  FiAward, FiUser, FiZap, FiLayers,
+  FiAward, FiUser, FiZap, FiLayers, FiEdit3,
 } from "react-icons/fi";
 import { useState } from "react";
 
@@ -19,6 +19,7 @@ const navLinks = [
   { label: "Learn", href: "/lesson", icon: <FiBookOpen /> },
   { label: "Flashcards", href: "/flashcards", icon: <FiLayers /> },
   { label: "Quiz", href: "/quiz", icon: <FiTarget /> },
+  { label: "Typing", href: "/typing", icon: <FiEdit3 /> },
   { label: "Saved", href: "/saved", icon: <FiStar /> },
   { label: "Leaderboard", href: "/leaderboard", icon: <FiAward /> },
 ];
