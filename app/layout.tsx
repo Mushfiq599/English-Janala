@@ -39,7 +39,7 @@ export const metadata: Metadata = {
   ],
   authors: [{ name: "Mushfiqur Rahman", url: "https://github.com/Mushfiq599" }],
   creator: "Mushfiqur Rahman",
-  metadataBase: new URL("https://english-janala.vercel.app"),
+  metadataBase: new URL("https://english-janala-azure.vercel.app"),
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,

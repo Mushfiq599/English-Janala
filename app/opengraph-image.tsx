@@ -116,7 +116,7 @@ export default async function Image() {
                         color: "#94a3b8",
                     }}
                 >
-                    english-janala.vercel.app
+                    english-janala-azure.vercel.app
                 </div>
             </div>
         ),
