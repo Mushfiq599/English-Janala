@@ -294,7 +294,7 @@ export default function Header() {
             backgroundColor: "var(--bg-card)",
             borderColor: "var(--border-color)",
           }}
-          className="lg:hidden border-t px-6 py-4 flex flex-col gap-1"
+          className="lg:hidden border-t px-6 py-4 flex flex-col gap-1 max-h-[80vh] overflow-y-auto"
         >
           {/* Learn accordion */}
           <button

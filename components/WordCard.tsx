@@ -9,10 +9,11 @@ import { useAuth } from "@/context/AuthContext";
 import { useProfile } from "@/context/ProfileContext";
 import { getDictionaryEntry } from "@/lib/api";
 import WordDetailModal from "@/components/WordDetailModal";
-import { FiVolume2, FiStar, FiInfo } from "react-icons/fi";
+import { FiVolume2, FiStar, FiInfo, FiLogIn } from "react-icons/fi";
 import { db } from "@/lib/firebase";
 import { doc, getDoc } from "firebase/firestore";
-import Image from "next/image";
+import { motion, AnimatePresence } from "framer-motion";
+import Link from "next/link";
 
 interface Props {
   word: Word;
@@ -33,6 +34,7 @@ export default function WordCard({
   const [saving, setSaving] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [imageUrl, setImageUrl] = useState<string | null>(null);
+  const [showLoginPrompt, setShowLoginPrompt] = useState(false);
 
   useEffect(() => {
     if (!user) return;
@@ -42,7 +44,13 @@ export default function WordCard({
   // Check saved state
   useEffect(() => {
     if (!user) return;
-    const ref = doc(db, "users", user.uid, "savedWords", String(word.id));
+    const ref = doc(
+      db,
+      "users",
+      user.uid,
+      "savedWords",
+      String(word.id)
+    );
     getDoc(ref)
       .then((snap) => setSaved(snap.exists()))
       .catch(() => {});
@@ -59,7 +67,12 @@ export default function WordCard({
   }, [word.word, themeTier]);
 
   const handleSave = async () => {
-    if (!user) return;
+    // Not logged in — show login prompt
+    if (!user) {
+      setShowLoginPrompt(true);
+      setTimeout(() => setShowLoginPrompt(false), 3000);
+      return;
+    }
     setSaving(true);
     try {
       if (saved) {
@@ -85,11 +98,13 @@ export default function WordCard({
       <div
         style={{
           backgroundColor: "var(--bg-card)",
-          borderColor: isKids ? "var(--accent)" : "var(--border-color)",
+          borderColor: isKids
+            ? "var(--accent)"
+            : "var(--border-color)",
           borderRadius: isKids ? "1.5rem" : "1rem",
           borderWidth: isKids ? "2px" : "1px",
         }}
-        className="shadow-sm p-5 flex flex-col gap-3 hover:shadow-md transition h-full"
+        className="shadow-sm p-5 flex flex-col gap-3 hover:shadow-md transition h-full relative"
       >
         {/* Kids image */}
         {isKids && imageUrl && (
@@ -197,25 +212,84 @@ export default function WordCard({
             <FiInfo size={14} />
             {isKids ? "What does it mean?" : "Details"}
           </button>
-          {user && (
+
+          {/* Save button — shows for everyone */}
+          <div className="relative">
             <button
               onClick={handleSave}
               disabled={saving}
-              title={saved ? "Remove from saved" : "Save word"}
+              title={
+                user
+                  ? saved
+                    ? "Remove from saved"
+                    : "Save word"
+                  : "Log in to save words"
+              }
               style={{
                 backgroundColor: saved ? "#fef9c3" : "var(--bg-page)",
                 color: saved ? "#f59e0b" : "var(--text-muted)",
               }}
               className="p-2 rounded-lg hover:opacity-80 transition"
             >
-              <FiStar size={isKids ? 20 : 16} fill={saved ? "#f59e0b" : "none"} />
+              <FiStar
+                size={isKids ? 20 : 16}
+                fill={saved ? "#f59e0b" : "none"}
+              />
             </button>
-          )}
+
+            {/* Login prompt tooltip */}
+            <AnimatePresence>
+              {showLoginPrompt && (
+                <motion.div
+                  initial={{ opacity: 0, y: 8, scale: 0.95 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: 8, scale: 0.95 }}
+                  transition={{ duration: 0.2 }}
+                  style={{
+                    backgroundColor: "var(--bg-card)",
+                    borderColor: "var(--border-color)",
+                  }}
+                  className="absolute bottom-full right-0 mb-2 w-44 border rounded-xl shadow-xl p-3 z-50"
+                >
+                  {/* Arrow */}
+                  <div
+                    style={{
+                      borderTopColor: "var(--border-color)",
+                    }}
+                    className="absolute -bottom-1.5 right-3 w-3 h-3 rotate-45 border-r border-b"
+                    style={{
+                      backgroundColor: "var(--bg-card)",
+                      borderColor: "var(--border-color)",
+                    }}
+                  />
+                  <p
+                    style={{ color: "var(--text-primary)" }}
+                    className="text-xs font-semibold mb-2"
+                  >
+                    {isKids
+                      ? "Log in to save words!"
+                      : "Log in to save words"}
+                  </p>
+                  <Link
+                    href="/login"
+                    style={{ backgroundColor: "var(--accent)" }}
+                    className="flex items-center justify-center gap-1.5 text-white text-xs font-bold px-3 py-1.5 rounded-lg hover:opacity-90 transition"
+                  >
+                    <FiLogIn size={12} />
+                    Log In
+                  </Link>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
         </div>
       </div>
 
       {modalOpen && (
-        <WordDetailModal word={word} onClose={() => setModalOpen(false)} />
+        <WordDetailModal
+          word={word}
+          onClose={() => setModalOpen(false)}
+        />
       )}
     </>
   );
