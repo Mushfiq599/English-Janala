@@ -7,12 +7,9 @@ import { useProfile } from "@/context/ProfileContext";
 import { getUserStats, UserStats } from "@/lib/userStats";
 import { updateLeaderboardEntry } from "@/lib/leaderboard";
 import { createUserProfile, calculateAge } from "@/lib/userProfile";
-import QuizHistory from "@/components/profile/QuizHistory";
 import Header from "@/components/Header";
 import SiteFooter from "@/components/layout/Footer";
 import { motion } from "framer-motion";
-import Link from "next/link";
-import { FiSettings } from "react-icons/fi";
 import {
     FiBookOpen,
     FiStar,
@@ -23,11 +20,16 @@ import {
     FiCalendar,
     FiAlertCircle,
     FiZap,
+    FiSettings,
 } from "react-icons/fi";
+import Link from "next/link";
+import QuizHistory from "@/components/profile/QuizHistory";
 import BadgeGrid from "@/components/profile/BadgeGrid";
 
-const tierLabels: Record<string, { label: string; color: string; bg: string }> =
-{
+const tierLabels: Record
+string,
+    { label: string; color: string; bg: string }
+    > = {
     kids: { label: "Young Explorer", color: "#f59e0b", bg: "#fef9c3" },
     teen: { label: "Teen Explorer", color: "#06b6d4", bg: "#cffafe" },
     scholar: { label: "Scholar", color: "#0ea5e9", bg: "#f0f9ff" },
@@ -65,7 +67,6 @@ export default function ProfilePage() {
         if (!authLoading && !user) router.push("/login");
     }, [user, authLoading, router]);
 
-    // Load stats independently of profile
     useEffect(() => {
         if (!user) return;
 
@@ -122,7 +123,12 @@ export default function ProfilePage() {
         if (!user) return;
         setSetupLoading(true);
         try {
-            await createUserProfile(user.uid, setupName, user.email ?? "", setupDOB);
+            await createUserProfile(
+                user.uid,
+                setupName,
+                user.email ?? "",
+                setupDOB
+            );
             await refreshProfile();
         } catch {
             setSetupError("Could not save profile. Please try again.");
@@ -148,7 +154,7 @@ export default function ProfilePage() {
         );
     }
 
-    // No profile document — show setup form
+    // No profile — show setup form
     if (!profile) {
         return (
             <main>
@@ -179,7 +185,7 @@ export default function ProfilePage() {
                             style={{ color: "var(--text-muted)" }}
                             className="text-sm text-center mb-6"
                         >
-                            We need a few details to personalize your experience
+                            We need a few details to personalise your experience
                         </p>
 
                         {setupError && (
@@ -235,7 +241,7 @@ export default function ProfilePage() {
                                     style={{ color: "var(--text-muted)" }}
                                     className="text-xs mt-1"
                                 >
-                                    Used to personalize your theme and learning experience
+                                    Used to personalise your theme and learning experience
                                 </p>
                             </div>
                             <button
@@ -255,6 +261,7 @@ export default function ProfilePage() {
     }
 
     const tier = tierLabels[themeTier];
+    const isKids = themeTier === "kids";
 
     const statCards = [
         {
@@ -287,6 +294,37 @@ export default function ProfilePage() {
         },
     ];
 
+    const kidsStatCards = [
+        {
+            emoji: "📚",
+            label: "Words I know",
+            value: stats?.totalWordsSeen ?? 0,
+            color: "#f59e0b",
+            bg: "#fef9c3",
+        },
+        {
+            emoji: "⭐",
+            label: "Words I saved",
+            value: stats?.totalSavedWords ?? 0,
+            color: "#8b5cf6",
+            bg: "#f5f3ff",
+        },
+        {
+            emoji: "🗺️",
+            label: "Lessons explored",
+            value: stats?.lessonsCompleted ?? 0,
+            color: "#22c55e",
+            bg: "#f0fdf4",
+        },
+        {
+            emoji: "🏆",
+            label: "Total lessons",
+            value: stats?.totalLessons ?? 0,
+            color: "#0ea5e9",
+            bg: "#f0f9ff",
+        },
+    ];
+
     return (
         <main>
             <Header />
@@ -307,7 +345,8 @@ export default function ProfilePage() {
                         {/* Avatar */}
                         <div
                             style={{ backgroundColor: "var(--accent)", color: "#fff" }}
-                            className="w-20 h-20 rounded-full flex items-center justify-center text-3xl font-bold flex-shrink-0"
+                            className={`rounded-full flex items-center justify-center font-bold flex-shrink-0 ${isKids ? "w-24 h-24 text-4xl" : "w-20 h-20 text-3xl"
+                                }`}
                         >
                             {profile.name?.charAt(0).toUpperCase() ?? "U"}
                         </div>
@@ -317,7 +356,7 @@ export default function ProfilePage() {
                             <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-2">
                                 <h1
                                     style={{ color: "var(--text-primary)" }}
-                                    className="text-2xl font-bold"
+                                    className={`font-bold ${isKids ? "text-3xl" : "text-2xl"}`}
                                 >
                                     {profile.name}
                                 </h1>
@@ -327,18 +366,18 @@ export default function ProfilePage() {
                                 >
                                     {tier.label}
                                 </span>
+                                <Link
+                                    href="/settings"
+                                    style={{
+                                        borderColor: "var(--border-color)",
+                                        color: "var(--text-secondary)",
+                                    }}
+                                    className="self-center flex items-center gap-1.5 text-xs border px-3 py-1.5 rounded-lg hover:opacity-80 transition"
+                                >
+                                    <FiSettings size={13} />
+                                    Edit Profile
+                                </Link>
                             </div>
-                            <Link
-                                href="/settings"
-                                style={{
-                                    borderColor: "var(--border-color)",
-                                    color: "var(--text-secondary)",
-                                }}
-                                className="self-center flex items-center gap-1.5 text-xs border px-3 py-1.5 rounded-lg hover:opacity-80 transition"
-                            >
-                                <FiSettings size={13} />
-                                Edit Profile
-                            </Link>
 
                             <div className="flex flex-col sm:flex-row gap-4 mt-3">
                                 <div
@@ -362,10 +401,13 @@ export default function ProfilePage() {
                                     <FiUser size={14} />
                                     Member since{" "}
                                     {profile.createdAt
-                                        ? new Date(profile.createdAt).toLocaleDateString("en-US", {
-                                            month: "long",
-                                            year: "numeric",
-                                        })
+                                        ? new Date(profile.createdAt).toLocaleDateString(
+                                            "en-US",
+                                            {
+                                                month: "long",
+                                                year: "numeric",
+                                            }
+                                        )
                                         : "—"}
                                 </div>
                             </div>
@@ -387,23 +429,31 @@ export default function ProfilePage() {
                     >
                         <div
                             style={{ backgroundColor: "#f59e0b", color: "#fff" }}
-                            className="w-14 h-14 rounded-2xl flex items-center justify-center flex-shrink-0"
+                            className={`rounded-2xl flex items-center justify-center flex-shrink-0 ${isKids ? "w-16 h-16" : "w-14 h-14"
+                                }`}
                         >
-                            <FiZap size={28} />
+                            <FiZap size={isKids ? 32 : 28} />
                         </div>
                         <div>
                             <p
-                                className="text-2xl font-bold"
+                                className={`font-bold ${isKids ? "text-3xl" : "text-2xl"}`}
                                 style={{ color: "#92400e" }}
                             >
                                 {streak} day{streak !== 1 ? "s" : ""} streak
+                                {isKids && streak >= 3 ? " 🔥" : ""}
                             </p>
                             <p className="text-sm" style={{ color: "#a16207" }}>
                                 {streak === 1
-                                    ? "You started a streak today! Come back tomorrow to keep it going."
+                                    ? isKids
+                                        ? "You started a streak! Come back tomorrow!"
+                                        : "You started a streak today! Come back tomorrow to keep it going."
                                     : streak >= 7
-                                        ? "Incredible consistency! Keep it up."
-                                        : "Great work! Visit a lesson every day to keep your streak alive."}
+                                        ? isKids
+                                            ? "You are on fire! Keep it up!"
+                                            : "Incredible consistency! Keep it up."
+                                        : isKids
+                                            ? "Great work! Come back every day!"
+                                            : "Great work! Visit a lesson every day to keep your streak alive."}
                             </p>
                         </div>
                     </motion.div>
@@ -414,7 +464,7 @@ export default function ProfilePage() {
                     style={{ color: "var(--text-primary)" }}
                     className="text-lg font-bold mb-4"
                 >
-                    Your Learning Stats
+                    {isKids ? "Your Adventure Stats" : "Your Learning Stats"}
                 </h2>
 
                 {statsError ? (
@@ -463,7 +513,40 @@ export default function ProfilePage() {
                             </div>
                         ))}
                     </div>
+                ) : isKids ? (
+                    // Kids stat cards — big, visual, emoji-driven
+                    <div className="grid grid-cols-2 gap-4 mb-10">
+                        {kidsStatCards.map((card, i) => (
+                            <motion.div
+                                key={i}
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ duration: 0.3, delay: i * 0.08 }}
+                                whileHover={{ scale: 1.03 }}
+                                style={{
+                                    backgroundColor: card.bg,
+                                    borderColor: card.color + "40",
+                                }}
+                                className="border-2 rounded-3xl p-6 text-center shadow-sm"
+                            >
+                                <div className="text-5xl mb-3">{card.emoji}</div>
+                                <div
+                                    style={{ color: card.color }}
+                                    className="text-4xl font-black mb-1"
+                                >
+                                    {card.value}
+                                </div>
+                                <p
+                                    style={{ color: card.color }}
+                                    className="text-sm font-bold opacity-80"
+                                >
+                                    {card.label}
+                                </p>
+                            </motion.div>
+                        ))}
+                    </div>
                 ) : (
+                    // Scholar / teen stat cards
                     <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
                         {statCards.map((card, i) => (
                             <motion.div
@@ -507,24 +590,24 @@ export default function ProfilePage() {
                             style={{ color: "var(--text-primary)" }}
                             className="text-lg font-bold mb-4"
                         >
-                            Lesson Progress
+                            {isKids ? "Map Progress" : "Lesson Progress"}
                         </h2>
                         <motion.div
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ duration: 0.4, delay: 0.3 }}
                             style={{
-                                backgroundColor: "var(--bg-card)",
-                                borderColor: "var(--border-color)",
+                                backgroundColor: isKids ? "#fef9c3" : "var(--bg-card)",
+                                borderColor: isKids ? "#fde68a" : "var(--border-color)",
                             }}
-                            className="border rounded-2xl p-6 shadow-sm"
+                            className="border rounded-2xl p-6 shadow-sm mb-10"
                         >
                             <div className="flex items-center justify-between mb-2">
                                 <p
-                                    style={{ color: "var(--text-secondary)" }}
-                                    className="text-sm"
+                                    style={{ color: isKids ? "#92400e" : "var(--text-secondary)" }}
+                                    className="text-sm font-medium"
                                 >
-                                    Lessons started
+                                    {isKids ? "Locations explored" : "Lessons started"}
                                 </p>
                                 <p
                                     style={{ color: "var(--accent)" }}
@@ -534,7 +617,9 @@ export default function ProfilePage() {
                                 </p>
                             </div>
                             <div
-                                style={{ backgroundColor: "var(--border-color)" }}
+                                style={{
+                                    backgroundColor: isKids ? "#fde68a" : "var(--border-color)",
+                                }}
                                 className="w-full h-3 rounded-full overflow-hidden"
                             >
                                 <motion.div
@@ -545,35 +630,50 @@ export default function ProfilePage() {
                                         width: `${(stats.lessonsCompleted / stats.totalLessons) * 100
                                             }%`,
                                     }}
-                                    transition={{ duration: 1, ease: "easeOut", delay: 0.5 }}
+                                    transition={{
+                                        duration: 1,
+                                        ease: "easeOut",
+                                        delay: 0.5,
+                                    }}
                                 />
                             </div>
                             <p
-                                style={{ color: "var(--text-muted)" }}
+                                style={{
+                                    color: isKids ? "#a16207" : "var(--text-muted)",
+                                }}
                                 className="text-xs mt-2"
                             >
                                 {Math.round(
                                     (stats.lessonsCompleted / stats.totalLessons) * 100
                                 )}
-                                % of all lessons explored
+                                %{" "}
+                                {isKids
+                                    ? "of the map explored!"
+                                    : "of all lessons explored"}
                             </p>
                         </motion.div>
                     </>
                 )}
-                {/* Quiz history */}
+
+                {/* Quiz history — not shown for kids */}
+                {!isKids && (
+                    <>
+                        <h2
+                            style={{ color: "var(--text-primary)" }}
+                            className="text-lg font-bold mb-4 mt-10"
+                        >
+                            Recent Quiz Results
+                        </h2>
+                        <QuizHistory />
+                    </>
+                )}
+
+                {/* Achievements */}
                 <h2
                     style={{ color: "var(--text-primary)" }}
                     className="text-lg font-bold mb-4 mt-10"
                 >
-                    Recent Quiz Results
-                </h2>
-                <QuizHistory />
-                {/* Badges */}
-                <h2
-                    style={{ color: "var(--text-primary)" }}
-                    className="text-lg font-bold mb-4 mt-10"
-                >
-                    Achievements
+                    {isKids ? "My Trophies" : "Achievements"}
                 </h2>
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}

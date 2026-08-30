@@ -6,10 +6,13 @@ import { pronounceWord } from "@/lib/speech";
 import { saveWord, removeSavedWord } from "@/lib/savedWords";
 import { markWordSeen } from "@/lib/progress";
 import { useAuth } from "@/context/AuthContext";
+import { useProfile } from "@/context/ProfileContext";
+import { getDictionaryEntry } from "@/lib/api";
 import WordDetailModal from "@/components/WordDetailModal";
 import { FiVolume2, FiStar, FiInfo } from "react-icons/fi";
 import { db } from "@/lib/firebase";
 import { doc, getDoc } from "firebase/firestore";
+import Image from "next/image";
 
 interface Props {
   word: Word;
@@ -25,17 +28,18 @@ export default function WordCard({
   onToast,
 }: Props) {
   const { user } = useAuth();
+  const { themeTier } = useProfile();
   const [saved, setSaved] = useState(false);
   const [saving, setSaving] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
+  const [imageUrl, setImageUrl] = useState<string | null>(null);
 
-  // Mark as seen
   useEffect(() => {
     if (!user) return;
     markWordSeen(user.uid, levelId, word.id).catch(() => {});
   }, [user, levelId, word.id]);
 
-  // Check if already saved on mount
+  // Check saved state
   useEffect(() => {
     if (!user) return;
     const ref = doc(db, "users", user.uid, "savedWords", String(word.id));
@@ -43,6 +47,16 @@ export default function WordCard({
       .then((snap) => setSaved(snap.exists()))
       .catch(() => {});
   }, [user, word.id]);
+
+  // Fetch image for kids tier
+  useEffect(() => {
+    if (themeTier !== "kids") return;
+    getDictionaryEntry(word.word)
+      .then((entry) => {
+        if (entry?.imageUrl) setImageUrl(entry.imageUrl);
+      })
+      .catch(() => {});
+  }, [word.word, themeTier]);
 
   const handleSave = async () => {
     if (!user) return;
@@ -64,15 +78,46 @@ export default function WordCard({
     }
   };
 
+  const isKids = themeTier === "kids";
+
   return (
     <>
       <div
         style={{
           backgroundColor: "var(--bg-card)",
-          borderColor: "var(--border-color)",
+          borderColor: isKids ? "var(--accent)" : "var(--border-color)",
+          borderRadius: isKids ? "1.5rem" : "1rem",
+          borderWidth: isKids ? "2px" : "1px",
         }}
-        className="rounded-2xl shadow-sm border p-5 flex flex-col gap-3 hover:shadow-md transition h-full"
+        className="shadow-sm p-5 flex flex-col gap-3 hover:shadow-md transition h-full"
       >
+        {/* Kids image */}
+        {isKids && imageUrl && (
+          <div className="w-full h-28 rounded-xl overflow-hidden bg-amber-50 flex items-center justify-center">
+            <img
+              src={imageUrl}
+              alt={word.word}
+              className="w-full h-full object-cover"
+              onError={() => setImageUrl(null)}
+            />
+          </div>
+        )}
+
+        {/* Kids placeholder when no image */}
+        {isKids && !imageUrl && (
+          <div
+            style={{ backgroundColor: "var(--accent-soft)" }}
+            className="w-full h-20 rounded-xl flex items-center justify-center"
+          >
+            <span
+              style={{ color: "var(--accent)" }}
+              className="text-4xl font-black opacity-30 select-none"
+            >
+              {word.word.charAt(0).toUpperCase()}
+            </span>
+          </div>
+        )}
+
         {/* New badge */}
         {isNew && user && (
           <div className="flex justify-end">
@@ -90,7 +135,7 @@ export default function WordCard({
           <div>
             <h3
               style={{ color: "var(--text-primary)" }}
-              className="text-lg font-bold"
+              className={`font-bold ${isKids ? "text-xl" : "text-lg"}`}
             >
               {word.word}
             </h3>
@@ -109,14 +154,16 @@ export default function WordCard({
             style={{ color: "var(--accent)" }}
             className="hover:opacity-70 transition p-1 flex-shrink-0"
           >
-            <FiVolume2 size={20} />
+            <FiVolume2 size={isKids ? 24 : 20} />
           </button>
         </div>
 
         {/* Meaning */}
         <p
           style={{ color: "var(--text-secondary)" }}
-          className="text-sm leading-relaxed line-clamp-2"
+          className={`leading-relaxed line-clamp-2 ${
+            isKids ? "text-base" : "text-sm"
+          }`}
         >
           {word.meaning}
         </p>
@@ -148,7 +195,7 @@ export default function WordCard({
             className="flex-1 flex items-center justify-center gap-1.5 text-sm font-medium py-1.5 rounded-lg hover:opacity-80 transition"
           >
             <FiInfo size={14} />
-            Details
+            {isKids ? "What does it mean?" : "Details"}
           </button>
           {user && (
             <button
@@ -161,7 +208,7 @@ export default function WordCard({
               }}
               className="p-2 rounded-lg hover:opacity-80 transition"
             >
-              <FiStar size={16} fill={saved ? "#f59e0b" : "none"} />
+              <FiStar size={isKids ? 20 : 16} fill={saved ? "#f59e0b" : "none"} />
             </button>
           )}
         </div>

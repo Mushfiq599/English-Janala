@@ -15,6 +15,9 @@ export default function BadgeGrid() {
     const { user } = useAuth();
     const { streak } = useProfile();
     const [earnedIds, setEarnedIds] = useState<string[]>([]);
+    const [newlyEarnedThisSession, setNewlyEarnedThisSession] = useState
+    string[]
+        > ([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -44,12 +47,16 @@ export default function BadgeGrid() {
                     wordsSeen: stats.totalWordsSeen,
                 });
 
-                // Merge old and new — badges never go away
                 const merged = Array.from(
                     new Set([...previouslyEarned, ...newlyEarned])
                 );
 
-                // Save if anything new was earned
+                // Track newly earned this session
+                const newOnes = merged.filter(
+                    (id) => !previouslyEarned.includes(id)
+                );
+                setNewlyEarnedThisSession(newOnes);
+
                 if (merged.length !== previouslyEarned.length) {
                     await saveEarnedBadges(user.uid, merged);
                 }
@@ -109,12 +116,26 @@ export default function BadgeGrid() {
             <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-3">
                 {ALL_BADGES.map((badge, i) => {
                     const earned = earnedIds.includes(badge.id);
+                    const isNew = newlyEarnedThisSession.includes(badge.id);
+
                     return (
                         <motion.div
                             key={badge.id}
                             initial={{ opacity: 0, scale: 0.9 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            transition={{ delay: i * 0.04 }}
+                            animate={{
+                                opacity: 1,
+                                scale: isNew ? [1, 1.15, 1] : 1,
+                            }}
+                            transition={{
+                                delay: i * 0.04,
+                                scale: isNew
+                                    ? {
+                                        duration: 0.5,
+                                        times: [0, 0.5, 1],
+                                        delay: 0.3,
+                                    }
+                                    : {},
+                            }}
                             title={`${badge.label} — ${badge.description}`}
                             style={{
                                 backgroundColor: earned
@@ -124,6 +145,9 @@ export default function BadgeGrid() {
                                     ? badge.color + "40"
                                     : "var(--border-color)",
                                 opacity: earned ? 1 : 0.4,
+                                boxShadow: isNew
+                                    ? `0 0 20px ${badge.color}60`
+                                    : "none",
                             }}
                             className="border-2 rounded-2xl p-3 flex flex-col items-center gap-2 text-center transition-all"
                         >
@@ -152,8 +176,21 @@ export default function BadgeGrid() {
                                 {badge.label}
                             </p>
 
-                            {/* Earned indicator */}
-                            {earned && (
+                            {/* New badge label */}
+                            {isNew && (
+                                <span
+                                    style={{
+                                        backgroundColor: badge.color,
+                                        color: "#fff",
+                                    }}
+                                    className="text-xs font-bold px-2 py-0.5 rounded-full"
+                                >
+                                    New!
+                                </span>
+                            )}
+
+                            {/* Earned dot */}
+                            {earned && !isNew && (
                                 <div
                                     style={{ backgroundColor: badge.color }}
                                     className="w-1.5 h-1.5 rounded-full"
