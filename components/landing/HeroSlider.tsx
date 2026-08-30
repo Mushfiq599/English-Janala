@@ -3,10 +3,16 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
-import Image from "next/image";
-import { FiMap, FiCompass, FiBookOpen, FiArrowRight, FiPlay } from "react-icons/fi";
+import {
+  FiMap,
+  FiCompass,
+  FiBookOpen,
+  FiArrowRight,
+  FiPlay,
+} from "react-icons/fi";
 import { useAuth } from "@/context/AuthContext";
 import { useProfile } from "@/context/ProfileContext";
+import SlideIllustration from "@/components/landing/SlideIllustration";
 
 const slides = [
   {
@@ -19,7 +25,6 @@ const slides = [
       "Go on a word adventure! Collect treasure words, solve fun quizzes, and become an English champion. Perfect for kids who love to explore!",
     cta: "Start Adventure",
     href: "/signup",
-    image: "/assets/hero-student.png",
     bg: "from-amber-50 to-yellow-100",
     darkBg: false,
     accent: "#f59e0b",
@@ -34,7 +39,6 @@ const slides = [
       "Master vocabulary, ace your exams, and sound fluent. Interactive lessons designed for teens who want to get ahead.",
     cta: "Start Learning",
     href: "/signup",
-    image: "/assets/hero-student.png",
     bg: "from-slate-900 to-cyan-950",
     darkBg: true,
     accent: "#06b6d4",
@@ -49,7 +53,6 @@ const slides = [
       "Structured vocabulary lessons tailored for IELTS and TOEFL preparation. Build the word power you need to achieve your target score.",
     cta: "Begin Preparation",
     href: "/signup",
-    image: "/assets/hero-student.png",
     bg: "from-sky-50 to-blue-100",
     darkBg: false,
     accent: "#0ea5e9",
@@ -63,7 +66,6 @@ const tierConfig = {
     darkBg: false,
     badge: "Welcome back, Explorer!",
     badgeIcon: <FiMap size={14} />,
-    headingPrefix: "Ready for your next",
     highlight: "Word Adventure?",
     description:
       "You are doing amazing! Pick up where you left off and collect more treasure words today.",
@@ -71,6 +73,7 @@ const tierConfig = {
     primaryHref: "/lesson",
     secondaryCta: "Take a Quiz",
     secondaryHref: "/quiz",
+    slideIndex: 0,
   },
   teen: {
     bg: "from-slate-900 to-cyan-950",
@@ -78,7 +81,6 @@ const tierConfig = {
     darkBg: true,
     badge: "Welcome back!",
     badgeIcon: <FiCompass size={14} />,
-    headingPrefix: "Keep building your",
     highlight: "Vocabulary Edge",
     description:
       "Every word you learn gets you closer to your goals. Jump back in and keep the momentum going.",
@@ -86,6 +88,7 @@ const tierConfig = {
     primaryHref: "/lesson",
     secondaryCta: "Test Yourself",
     secondaryHref: "/quiz",
+    slideIndex: 1,
   },
   scholar: {
     bg: "from-sky-50 to-blue-100",
@@ -93,7 +96,6 @@ const tierConfig = {
     darkBg: false,
     badge: "Welcome back, Scholar!",
     badgeIcon: <FiBookOpen size={14} />,
-    headingPrefix: "Continue your path to",
     highlight: "English Mastery",
     description:
       "Your IELTS and TOEFL preparation is ongoing. Review your saved words or continue with the next lesson.",
@@ -101,6 +103,7 @@ const tierConfig = {
     primaryHref: "/lesson",
     secondaryCta: "Review Saved Words",
     secondaryHref: "/saved",
+    slideIndex: 2,
   },
 };
 
@@ -110,7 +113,6 @@ export default function HeroSlider() {
   const [current, setCurrent] = useState(0);
   const [direction, setDirection] = useState(1);
 
-  // Auto advance — only for logged out slider
   useEffect(() => {
     if (user) return;
     const timer = setInterval(() => {
@@ -120,7 +122,6 @@ export default function HeroSlider() {
     return () => clearInterval(timer);
   }, [user]);
 
-  // Keyboard navigation
   useEffect(() => {
     if (user) return;
     const handler = (e: KeyboardEvent) => {
@@ -142,7 +143,7 @@ export default function HeroSlider() {
     setCurrent(index);
   };
 
-  // Logged in — show personalized hero
+  // Logged in — personalized hero
   if (user && !loading) {
     const config = tierConfig[themeTier];
     const firstName = profile?.name?.split(" ")[0] ?? "there";
@@ -158,9 +159,7 @@ export default function HeroSlider() {
             transition={{ duration: 0.5 }}
             className="flex flex-col-reverse md:flex-row items-center gap-12"
           >
-            {/* Text */}
             <div className="flex-1 text-center md:text-left">
-              {/* Badge */}
               <motion.span
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -175,7 +174,6 @@ export default function HeroSlider() {
                 {config.badge}
               </motion.span>
 
-              {/* Heading */}
               <motion.h1
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -201,7 +199,6 @@ export default function HeroSlider() {
                 {config.description}
               </motion.p>
 
-              {/* CTAs */}
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -230,21 +227,14 @@ export default function HeroSlider() {
               </motion.div>
             </div>
 
-            {/* Image */}
+            {/* Unique illustration per tier */}
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.1 }}
               className="flex-1 flex justify-center"
             >
-              <Image
-                src="/assets/hero-student.png"
-                alt="Keep learning"
-                width={420}
-                height={420}
-                priority
-                className="drop-shadow-2xl"
-              />
+              <SlideIllustration slide={config.slideIndex} />
             </motion.div>
           </motion.div>
         </div>
@@ -252,7 +242,7 @@ export default function HeroSlider() {
     );
   }
 
-  // Logged out — original slider
+  // Logged out — slider
   const slide = slides[current];
 
   const variants = {
@@ -302,7 +292,9 @@ export default function HeroSlider() {
                 }`}
               >
                 {slide.heading}{" "}
-                <span style={{ color: slide.accent }}>{slide.highlight}</span>
+                <span style={{ color: slide.accent }}>
+                  {slide.highlight}
+                </span>
               </motion.h1>
 
               <motion.p
@@ -344,21 +336,14 @@ export default function HeroSlider() {
               </motion.div>
             </div>
 
-            {/* Image */}
+            {/* Unique illustration per slide */}
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.1 }}
               className="flex-1 flex justify-center"
             >
-              <Image
-                src={slide.image}
-                alt="Learning English"
-                width={480}
-                height={480}
-                priority
-                className="drop-shadow-2xl"
-              />
+              <SlideIllustration slide={slide.id} />
             </motion.div>
           </motion.div>
         </AnimatePresence>
@@ -370,7 +355,8 @@ export default function HeroSlider() {
               key={i}
               onClick={() => goTo(i)}
               style={{
-                backgroundColor: i === current ? slide.accent : "#d1d5db",
+                backgroundColor:
+                  i === current ? slide.accent : "#d1d5db",
                 width: i === current ? "2rem" : "0.75rem",
               }}
               className="h-3 rounded-full transition-all duration-300"
@@ -378,7 +364,9 @@ export default function HeroSlider() {
           ))}
         </div>
         <p
-          style={{ color: slide.darkBg ? "#94a3b8" : "#9ca3af" }}
+          style={{
+            color: slide.darkBg ? "#94a3b8" : "#9ca3af",
+          }}
           className="text-center text-xs mt-4"
         >
           Use arrow keys to navigate slides
