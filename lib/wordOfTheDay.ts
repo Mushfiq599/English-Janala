@@ -12,10 +12,14 @@ export interface WordOfTheDay {
 }
 
 function getDayIndex(total: number): number {
-    const start = new Date("2024-01-01").getTime();
-    const now = new Date().getTime();
+    // Use UTC date to avoid timezone inconsistencies between server and client
+    const now = new Date();
+    const utcDate = new Date(
+        Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate())
+    );
+    const start = new Date(Date.UTC(2024, 0, 1));
     const daysSinceStart = Math.floor(
-        (now - start) / (1000 * 60 * 60 * 24)
+        (utcDate.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)
     );
     return daysSinceStart % total;
 }

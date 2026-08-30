@@ -2,37 +2,87 @@
 
 import { motion, useInView, animate } from "framer-motion";
 import { useRef, useEffect, useState } from "react";
-import { FiBook, FiMap, FiStar, FiUsers } from "react-icons/fi";
+import {
+  FiBook,
+  FiMap,
+  FiTarget,
+  FiGlobe,
+} from "react-icons/fi";
 
 const stats = [
-  { value: 1000, suffix: "+", label: "Vocabulary Words", icon: <FiBook size={28} /> },
-  { value: 7, suffix: "", label: "Structured Lessons", icon: <FiMap size={28} /> },
-  { value: 98, suffix: "%", label: "Learner Satisfaction", icon: <FiStar size={28} /> },
-  { value: 5000, suffix: "+", label: "Active Learners", icon: <FiUsers size={28} /> },
+  {
+    value: 7,
+    suffix: "",
+    label: "Structured Lessons",
+    sublabel: "From Basic to TOEFL level",
+    icon: <FiMap size={28} />,
+  },
+  {
+    value: 1000,
+    suffix: "+",
+    label: "Vocabulary Words",
+    sublabel: "With meanings, examples and audio",
+    icon: <FiBook size={28} />,
+  },
+  {
+    value: 6,
+    suffix: "",
+    label: "Learning Modes",
+    sublabel: "Lessons, Flashcards, Quiz, Typing and more",
+    icon: <FiTarget size={28} />,
+  },
+  {
+    value: 4,
+    suffix: "",
+    label: "Exam Packs",
+    sublabel: "AWL, IELTS, TOEFL and Advanced",
+    icon: <FiGlobe size={28} />,
+  },
 ];
 
-const testimonials = [
+const features = [
   {
-    name: "Riya, Age 9",
-    quote: "I love collecting words! My English is so much better now.",
-    initials: "R",
+    name: "Riya",
+    age: "Age 9",
+    tier: "Young Explorer",
+    tierColor: "#f59e0b",
+    tierBg: "#fef9c3",
+    initial: "R",
     accent: "#f59e0b",
+    quote:
+      "Map-pin lessons make learning feel like a real adventure. The confetti when I get everything right is the best part!",
   },
   {
-    name: "Tanvir, Age 16",
-    quote: "The quiz mode really helped me improve my vocabulary for my O-Levels.",
-    initials: "T",
+    name: "Tanvir",
+    age: "Age 16",
+    tier: "Teen Explorer",
+    tierColor: "#06b6d4",
+    tierBg: "#cffafe",
+    initial: "T",
     accent: "#06b6d4",
+    quote:
+      "The typing challenge is genuinely hard — much better than just clicking multiple choice. My vocabulary has improved noticeably.",
   },
   {
-    name: "Nusrat, Age 24",
-    quote: "I scored 7.5 on IELTS. The advanced lessons were exactly what I needed.",
-    initials: "N",
+    name: "Nusrat",
+    age: "Age 24",
+    tier: "Scholar",
+    tierColor: "#0ea5e9",
+    tierBg: "#f0f9ff",
+    initial: "N",
     accent: "#0ea5e9",
+    quote:
+      "The IELTS and TOEFL exam packs cover exactly the words that appear in the Academic Word List. Exactly what I needed for preparation.",
   },
 ];
 
-function AnimatedCounter({ value, suffix }: { value: number; suffix: string }) {
+function AnimatedCounter({
+  value,
+  suffix,
+}: {
+  value: number;
+  suffix: string;
+}) {
   const ref = useRef(null);
   const inView = useInView(ref, { once: true });
   const [display, setDisplay] = useState(0);
@@ -60,26 +110,37 @@ export default function StatsSection() {
   const inView = useInView(ref, { once: true, margin: "-100px" });
 
   return (
-    <section style={{ backgroundColor: "var(--bg-page)" }} className="py-24" ref={ref}>
+    <section
+      style={{ backgroundColor: "var(--bg-page)" }}
+      className="py-24"
+      ref={ref}
+    >
       <div className="w-11/12 max-w-6xl mx-auto">
+        {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={inView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.5 }}
-          className="text-center mb-16"
+          className="text-center mb-6"
         >
           <span
-            style={{ color: "var(--accent)", backgroundColor: "var(--accent-soft)" }}
+            style={{
+              color: "var(--accent)",
+              backgroundColor: "var(--accent-soft)",
+            }}
             className="text-sm font-semibold px-4 py-1.5 rounded-full"
           >
             By the numbers
           </span>
-          <h2 style={{ color: "var(--text-primary)" }} className="text-3xl md:text-4xl font-bold mt-4">
-            Trusted by learners of all ages
+          <h2
+            style={{ color: "var(--text-primary)" }}
+            className="text-3xl md:text-4xl font-bold mt-4 mb-16"
+          >
+            Everything you need in one place
           </h2>
         </motion.div>
 
-        {/* Stats */}
+        {/* Stats grid */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-24">
           {stats.map((stat, i) => (
             <motion.div
@@ -93,33 +154,59 @@ export default function StatsSection() {
               }}
               className="border rounded-2xl p-6 text-center shadow-sm"
             >
-              <div style={{ color: "var(--accent)" }} className="flex justify-center mb-3">
+              <div
+                style={{ color: "var(--accent)" }}
+                className="flex justify-center mb-3"
+              >
                 {stat.icon}
               </div>
-              <div style={{ color: "var(--accent)" }} className="text-3xl font-bold mb-1">
+              <div
+                style={{ color: "var(--accent)" }}
+                className="text-3xl font-bold mb-1"
+              >
                 <AnimatedCounter value={stat.value} suffix={stat.suffix} />
               </div>
-              <p style={{ color: "var(--text-secondary)" }} className="text-sm font-medium">
+              <p
+                style={{ color: "var(--text-primary)" }}
+                className="text-sm font-semibold mb-1"
+              >
                 {stat.label}
+              </p>
+              <p
+                style={{ color: "var(--text-muted)" }}
+                className="text-xs leading-snug"
+              >
+                {stat.sublabel}
               </p>
             </motion.div>
           ))}
         </div>
 
-        {/* Testimonials */}
+        {/* What each tier gets section */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={inView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.5, delay: 0.2 }}
           className="text-center mb-12"
         >
-          <h3 style={{ color: "var(--text-primary)" }} className="text-2xl font-bold">
-            What our learners say
+          <h3
+            style={{ color: "var(--text-primary)" }}
+            className="text-2xl font-bold"
+          >
+            Built for every type of learner
           </h3>
+          <p
+            style={{ color: "var(--text-secondary)" }}
+            className="text-sm mt-2"
+          >
+            Your experience adapts based on your age — kids, teens, and
+            adults each get a different interface tailored to them
+          </p>
         </motion.div>
 
+        {/* Tier cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {testimonials.map((t, i) => (
+          {features.map((f, i) => (
             <motion.div
               key={i}
               initial={{ opacity: 0, y: 30 }}
@@ -131,17 +218,47 @@ export default function StatsSection() {
               }}
               className="border rounded-2xl p-6 shadow-sm"
             >
-              <div
-                style={{ backgroundColor: t.accent, color: "#fff" }}
-                className="w-12 h-12 rounded-full flex items-center justify-center font-bold text-lg mb-4"
-              >
-                {t.initials}
+              {/* Avatar + tier */}
+              <div className="flex items-center gap-3 mb-4">
+                <div
+                  style={{ backgroundColor: f.accent, color: "#fff" }}
+                  className="w-12 h-12 rounded-full flex items-center justify-center font-bold text-lg flex-shrink-0"
+                >
+                  {f.initial}
+                </div>
+                <div>
+                  <p
+                    style={{ color: "var(--text-primary)" }}
+                    className="font-bold text-sm"
+                  >
+                    {f.name}, {f.age}
+                  </p>
+                  <span
+                    style={{
+                      backgroundColor: f.tierBg,
+                      color: f.tierColor,
+                    }}
+                    className="text-xs font-semibold px-2 py-0.5 rounded-full"
+                  >
+                    {f.tier}
+                  </span>
+                </div>
               </div>
-              <p style={{ color: "var(--text-secondary)" }} className="text-sm leading-relaxed italic mb-4">
-                &ldquo;{t.quote}&rdquo;
+
+              {/* Feature highlight */}
+              <p
+                style={{ color: "var(--text-secondary)" }}
+                className="text-sm leading-relaxed italic"
+              >
+                &ldquo;{f.quote}&rdquo;
               </p>
-              <p style={{ color: "var(--text-primary)" }} className="text-sm font-bold">
-                {t.name}
+
+              {/* Disclaimer */}
+              <p
+                style={{ color: "var(--text-muted)" }}
+                className="text-xs mt-3"
+              >
+                Illustrative example of how each tier experiences the app
               </p>
             </motion.div>
           ))}

@@ -6,21 +6,38 @@ import { useAuth } from "@/context/AuthContext";
 import { useTheme } from "@/context/ThemeContext";
 import { useProfile } from "@/context/ProfileContext";
 import { useRouter, usePathname } from "next/navigation";
-import { FiSettings } from "react-icons/fi";
 import {
-  FiSun, FiMoon, FiMenu, FiX, FiLogOut, FiLogIn,
-  FiBookOpen, FiStar, FiHelpCircle, FiTarget,
-  FiAward, FiUser, FiZap, FiLayers, FiEdit3, FiBook,
+  FiSun,
+  FiMoon,
+  FiMenu,
+  FiX,
+  FiLogOut,
+  FiLogIn,
+  FiBookOpen,
+  FiStar,
+  FiHelpCircle,
+  FiTarget,
+  FiAward,
+  FiUser,
+  FiZap,
+  FiLayers,
+  FiEdit3,
+  FiBook,
+  FiChevronDown,
+  FiSettings,
 } from "react-icons/fi";
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
+
+const learnLinks = [
+  { label: "All Lessons", href: "/lesson", icon: <FiBookOpen size={14} /> },
+  { label: "Flashcards", href: "/flashcards", icon: <FiLayers size={14} /> },
+  { label: "Quiz Mode", href: "/quiz", icon: <FiTarget size={14} /> },
+  { label: "Typing Challenge", href: "/typing", icon: <FiEdit3 size={14} /> },
+  { label: "Exam Prep", href: "/exam-prep", icon: <FiBook size={14} /> },
+];
 
 const navLinks = [
   { label: "FAQ", href: "/faq", icon: <FiHelpCircle /> },
-  { label: "Learn", href: "/lesson", icon: <FiBookOpen /> },
-  { label: "Flashcards", href: "/flashcards", icon: <FiLayers /> },
-  { label: "Quiz", href: "/quiz", icon: <FiTarget /> },
-  { label: "Typing", href: "/typing", icon: <FiEdit3 /> },
-  { label: "Exam Prep", href: "/exam-prep", icon: <FiBook /> },
   { label: "Saved", href: "/saved", icon: <FiStar /> },
   { label: "Leaderboard", href: "/leaderboard", icon: <FiAward /> },
 ];
@@ -32,11 +49,30 @@ export default function Header() {
   const router = useRouter();
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [learnOpen, setLearnOpen] = useState(false);
+  const [mobileLearnOpen, setMobileLearnOpen] = useState(false);
+  const learnRef = useRef<HTMLDivElement>(null);
 
   const handleLogout = async () => {
     await logOut();
     router.push("/");
   };
+
+  // Close learn dropdown when clicking outside
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (
+        learnRef.current &&
+        !learnRef.current.contains(e.target as Node)
+      ) {
+        setLearnOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
+
+  const isLearnActive = learnLinks.some((l) => pathname === l.href);
 
   return (
     <header
@@ -68,6 +104,66 @@ export default function Header() {
 
         {/* Desktop nav */}
         <nav className="hidden lg:flex items-center gap-1">
+          {/* Learn dropdown */}
+          <div className="relative" ref={learnRef}>
+            <button
+              onClick={() => setLearnOpen((v) => !v)}
+              style={{
+                color: isLearnActive
+                  ? "var(--accent)"
+                  : "var(--text-secondary)",
+                backgroundColor: isLearnActive
+                  ? "var(--accent-soft)"
+                  : "transparent",
+              }}
+              className="flex items-center gap-1.5 text-sm font-medium px-4 py-2 rounded-lg hover:bg-sky-100 transition"
+            >
+              <FiBookOpen size={15} />
+              Learn
+              <FiChevronDown
+                size={13}
+                className={`transition-transform duration-200 ${
+                  learnOpen ? "rotate-180" : ""
+                }`}
+              />
+            </button>
+
+            {/* Dropdown */}
+            {learnOpen && (
+              <div
+                style={{
+                  backgroundColor: "var(--bg-card)",
+                  borderColor: "var(--border-color)",
+                }}
+                className="absolute top-full left-0 mt-2 w-52 border rounded-2xl shadow-xl overflow-hidden z-50"
+              >
+                {learnLinks.map((link) => {
+                  const isActive = pathname === link.href;
+                  return (
+                    <Link
+                      key={link.href}
+                      href={link.href}
+                      onClick={() => setLearnOpen(false)}
+                      style={{
+                        color: isActive
+                          ? "var(--accent)"
+                          : "var(--text-secondary)",
+                        backgroundColor: isActive
+                          ? "var(--accent-soft)"
+                          : "transparent",
+                      }}
+                      className="flex items-center gap-2.5 text-sm font-medium px-4 py-3 hover:opacity-80 transition"
+                    >
+                      {link.icon}
+                      {link.label}
+                    </Link>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+
+          {/* Regular nav links */}
           {navLinks.map((link) => {
             const isActive = pathname === link.href;
             return (
@@ -75,7 +171,9 @@ export default function Header() {
                 key={link.href}
                 href={link.href}
                 style={{
-                  color: isActive ? "var(--accent)" : "var(--text-secondary)",
+                  color: isActive
+                    ? "var(--accent)"
+                    : "var(--text-secondary)",
                   backgroundColor: isActive
                     ? "var(--accent-soft)"
                     : "transparent",
@@ -115,7 +213,7 @@ export default function Header() {
                 </div>
               )}
 
-              {/* Profile link */}
+              {/* Profile */}
               <Link
                 href="/profile"
                 style={{
@@ -159,7 +257,6 @@ export default function Header() {
 
         {/* Mobile right side */}
         <div className="lg:hidden flex items-center gap-2">
-          {/* Streak badge mobile */}
           {user && streak > 0 && (
             <div
               style={{
@@ -173,8 +270,6 @@ export default function Header() {
               {streak}
             </div>
           )}
-
-          {/* Dark mode toggle */}
           <button
             onClick={toggleDark}
             style={{ color: "var(--text-secondary)" }}
@@ -182,8 +277,6 @@ export default function Header() {
           >
             {dark ? <FiSun size={18} /> : <FiMoon size={18} />}
           </button>
-
-          {/* Hamburger */}
           <button
             onClick={() => setMobileOpen(!mobileOpen)}
             style={{ color: "var(--text-secondary)" }}
@@ -201,28 +294,81 @@ export default function Header() {
             backgroundColor: "var(--bg-card)",
             borderColor: "var(--border-color)",
           }}
-          className="lg:hidden border-t px-6 py-4 flex flex-col gap-2"
+          className="lg:hidden border-t px-6 py-4 flex flex-col gap-1"
         >
-          {navLinks.map((link) => {
-            const isActive = pathname === link.href;
-            return (
-              <Link
-                key={link.href}
-                href={link.href}
-                onClick={() => setMobileOpen(false)}
-                style={{
-                  color: isActive ? "var(--accent)" : "var(--text-secondary)",
-                  backgroundColor: isActive
+          {/* Learn accordion */}
+          <button
+            onClick={() => setMobileLearnOpen((v) => !v)}
+            style={{
+              color: isLearnActive
+                ? "var(--accent)"
+                : "var(--text-secondary)",
+              backgroundColor: isLearnActive
+                ? "var(--accent-soft)"
+                : "transparent",
+            }}
+            className="flex items-center justify-between text-sm font-medium py-2.5 px-3 rounded-lg hover:bg-sky-50 transition w-full"
+          >
+            <span className="flex items-center gap-2">
+              <FiBookOpen size={15} />
+              Learn
+            </span>
+            <FiChevronDown
+              size={13}
+              className={`transition-transform duration-200 ${
+                mobileLearnOpen ? "rotate-180" : ""
+              }`}
+            />
+          </button>
+
+          {mobileLearnOpen && (
+            <div className="pl-4 flex flex-col gap-1 mb-1">
+              {learnLinks.map((link) => (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  onClick={() => setMobileOpen(false)}
+                  style={{
+                    color:
+                      pathname === link.href
+                        ? "var(--accent)"
+                        : "var(--text-secondary)",
+                    backgroundColor:
+                      pathname === link.href
+                        ? "var(--accent-soft)"
+                        : "transparent",
+                  }}
+                  className="flex items-center gap-2 text-sm font-medium py-2 px-3 rounded-lg hover:bg-sky-50 transition"
+                >
+                  {link.icon}
+                  {link.label}
+                </Link>
+              ))}
+            </div>
+          )}
+
+          {/* Regular links */}
+          {navLinks.map((link) => (
+            <Link
+              key={link.href}
+              href={link.href}
+              onClick={() => setMobileOpen(false)}
+              style={{
+                color:
+                  pathname === link.href
+                    ? "var(--accent)"
+                    : "var(--text-secondary)",
+                backgroundColor:
+                  pathname === link.href
                     ? "var(--accent-soft)"
                     : "transparent",
-                }}
-                className="flex items-center gap-2 text-sm font-medium py-2.5 px-3 rounded-lg hover:bg-sky-50 transition"
-              >
-                {link.icon}
-                {link.label}
-              </Link>
-            );
-          })}
+              }}
+              className="flex items-center gap-2 text-sm font-medium py-2.5 px-3 rounded-lg hover:bg-sky-50 transition"
+            >
+              {link.icon}
+              {link.label}
+            </Link>
+          ))}
 
           <div
             style={{ borderColor: "var(--border-color)" }}
