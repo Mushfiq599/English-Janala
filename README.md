@@ -33,11 +33,11 @@ Built with **Next.js App Router**, **TypeScript**, **MongoDB**, and **Firebase A
 > **Home Page — Hero Section**
 ![Home Page](./screenshots/homepage.png)
 
-> **Lesson Page**
-![Lesson Page](./screenshots/lesson.png)
-
 > **Quiz Mode**
-![Quiz Mode](./screenshots/profile.png)
+![Quiz Mode](./screenshots/lesson.png)
+
+> **Lesson Page**
+![Lesson Page](./screenshots/profile.png)
 
 > **Leaderboard**
 ![Leaderboard](./screenshots/leaderboard.png)
