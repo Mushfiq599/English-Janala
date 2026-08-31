@@ -37,13 +37,13 @@ Built with **Next.js App Router**, **TypeScript**, **MongoDB**, and **Firebase A
 ![Lesson Page](./screenshots/lesson.png)
 
 > **Quiz Mode**
-![Quiz Mode](./screenshots/quiz.png)
+![Quiz Mode](./screenshots/profile.png)
 
 > **Leaderboard**
 ![Leaderboard](./screenshots/leaderboard.png)
 
 > **Flashcard Mode**
-![Flashcards](./screenshots/flashcards.png)
+![Flashcards](./screenshots/flashcard.png)
 
 ---
 
